@@ -1170,16 +1170,6 @@
       </div>
     </header>
 
-    <!-- Header Banner -->
-    <div class="admin-header-card">
-      <div class="bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-      <div class="admin-title-badge">
-        <i class="fa-solid fa-crown"></i>
-        <span>Admin Control Center</span>
-      </div>
-      <h1 class="admin-main-heading">Juveriya &amp; Abdul Hadi</h1>
-    </div>
-
     <!-- Main Creation Card -->
     <div class="admin-card">
       <form id="adminInviteForm">
@@ -1590,7 +1580,9 @@
           baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '').replace(/\/$/, '') + '/';
         }
 
-        const inviteUrl = `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=${withFamily ? 'true' : 'false'}`;
+        const inviteUrl = withFamily 
+          ? `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=true` 
+          : `${baseUrl}?name=${encodeURIComponent(cleanName)}`;
 
         const message = 
           `✨ You’re Invited! ✨\n` +

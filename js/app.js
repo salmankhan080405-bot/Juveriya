@@ -123,7 +123,7 @@
 
     if (paramName) {
       initialName = paramName.trim();
-      withFamily = paramFamily !== 'false' && paramFamily !== '0';
+      withFamily = paramFamily === 'true' || paramFamily === '1';
       setGuestInformation(initialName, withFamily);
     } else {
       // 2. Check localStorage for previously typed/assigned name
@@ -911,7 +911,9 @@
       if (!isLocal && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
         baseUrl = window.location.origin + window.location.pathname;
       }
-      const inviteUrl = `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=${withFamily ? 'true' : 'false'}`;
+      const inviteUrl = withFamily 
+        ? `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=true` 
+        : `${baseUrl}?name=${encodeURIComponent(cleanName)}`;
 
       const message = 
         `✨ You’re Invited! ✨\n` +
