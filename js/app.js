@@ -348,34 +348,51 @@
   }
 
   // =========================================================================
-  // 3D Card Folding Interaction
+  // 3D Card Folding Interaction (Explicit Open / Close)
   // =========================================================================
-  function toggleCardFold() {
-    isOpen = !isOpen;
-    playUnfoldSound();
+  function openCard() {
+    if (isOpen) return;
+    isOpen = true;
+    weddingCard.classList.add('is-open');
 
-    if (isOpen) {
-      weddingCard.classList.add('is-open');
-      if (btnFoldToggle) {
-        btnFoldToggle.classList.add('active');
-        btnFoldToggle.innerHTML = '<i class="fa-solid fa-door-closed"></i> <span class="btn-text">Fold Card</span>';
-      }
-      
-      // Auto-start ambient melody on first reveal if not playing yet
-      if (!isAudioPlaying && !sessionStorage.getItem('audioPrompted')) {
-        sessionStorage.setItem('audioPrompted', 'true');
-        startAmbientMelody();
-      }
-    } else {
-      weddingCard.classList.remove('is-open');
-      if (btnFoldToggle) {
-        btnFoldToggle.classList.remove('active');
-        btnFoldToggle.innerHTML = '<i class="fa-solid fa-door-open"></i> <span class="btn-text">Open Card</span>';
-      }
+    try {
+      playUnfoldSound();
+    } catch (e) {
+      console.warn('Audio effect error:', e);
+    }
+
+    if (!isAudioPlaying && !sessionStorage.getItem('audioPrompted')) {
+      sessionStorage.setItem('audioPrompted', 'true');
+      startAmbientMelody();
     }
   }
 
-  // Expose toggleCardFold globally so onclick="toggleCardFold()" works infallibly
+  function closeCard() {
+    if (!isOpen) return;
+    isOpen = false;
+    weddingCard.classList.remove('is-open');
+
+    try {
+      playUnfoldSound();
+    } catch (e) {
+      console.warn('Audio effect error:', e);
+    }
+  }
+
+  function toggleCardFold(e) {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
+    if (isOpen) {
+      closeCard();
+    } else {
+      openCard();
+    }
+  }
+
+  // Expose globally so onclick="openCard()" or onclick="toggleCardFold()" work infallibly
+  window.openCard = openCard;
+  window.closeCard = closeCard;
   window.toggleCardFold = toggleCardFold;
 
   // =========================================================================
@@ -687,33 +704,55 @@
     if (btnEditGuestName) btnEditGuestName.addEventListener('click', reopenGuestGate);
 
     // Wax Seal, Big TAP button & Fold Toggle
-    if (waxSeal) {
-      waxSeal.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleCardFold();
-      });
-    }
-    if (waxSealWrapper) {
-      waxSealWrapper.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleCardFold();
-      });
-    }
     const cardTapBtn = document.getElementById('cardTapBtn');
     if (cardTapBtn) {
-      cardTapBtn.addEventListener('click', (e) => {
+      cardTapBtn.onclick = function (e) {
         e.stopPropagation();
-        toggleCardFold();
+        openCard();
+      };
+    }
+
+    if (waxSeal) {
+      waxSeal.onclick = function (e) {
+        e.stopPropagation();
+        openCard();
+      };
+    }
+
+    if (waxSealWrapper) {
+      waxSealWrapper.onclick = function (e) {
+        e.stopPropagation();
+        openCard();
+      };
+    }
+
+    // Tapping on closed flaps also opens card
+    const flapLeft = document.getElementById('flapLeft');
+    const flapRight = document.getElementById('flapRight');
+    if (flapLeft) {
+      flapLeft.addEventListener('click', (e) => {
+        if (!isOpen) {
+          e.stopPropagation();
+          openCard();
+        }
       });
     }
-    if (btnFoldToggle) btnFoldToggle.addEventListener('click', toggleCardFold);
-    if (fabToggleFold) fabToggleFold.addEventListener('click', toggleCardFold);
+    if (flapRight) {
+      flapRight.addEventListener('click', (e) => {
+        if (!isOpen) {
+          e.stopPropagation();
+          openCard();
+        }
+      });
+    }
 
-    // Clicking on wedding card folds/unfolds (ignore clicks on links or interactive buttons)
+    // Clicking anywhere on card when open folds it back (except links)
     if (weddingCard) {
       weddingCard.addEventListener('click', (e) => {
         if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
-        toggleCardFold();
+        if (isOpen) {
+          closeCard();
+        }
       });
     }
 

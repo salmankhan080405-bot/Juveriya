@@ -1023,13 +1023,18 @@ body {
   pointer-events: auto;
 }
 
-/* Big Royal TAP Button perfectly centered under AJ Seal */
+/* Big Royal TAP Button perfectly centered horizontally on the card */
 .card-tap-btn {
   position: absolute;
-  top: calc(100% + 28px);
-  left: 50%;
-  transform: translateX(-50%);
-  display: inline-flex;
+  bottom: 42px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
+  max-width: 85%;
+  transform: translateZ(45px);
+  z-index: 60;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -1048,11 +1053,17 @@ body {
     0 12px 35px rgba(0, 0, 0, 0.85),
     0 0 25px rgba(255, 215, 0, 0.7),
     inset 0 1px 3px rgba(255, 255, 255, 0.9);
-  animation: tapButtonPulse 2.2s infinite ease-in-out;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: tapButtonGlow 2.2s infinite ease-in-out;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
   user-select: none;
   -webkit-user-select: none;
   white-space: nowrap;
+}
+
+.wedding-card-3d.is-open .card-tap-btn {
+  transform: translateZ(-30px) scale(0);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .card-tap-btn .tap-icon {
@@ -1061,18 +1072,12 @@ body {
   animation: tapHandBounce 1.5s infinite ease-in-out;
 }
 
-@keyframes tapButtonPulse {
+@keyframes tapButtonGlow {
   0%, 100% {
-    transform: scale(1);
-    box-shadow: 
-      0 12px 35px rgba(0, 0, 0, 0.85),
-      0 0 25px rgba(255, 215, 0, 0.6);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(255, 215, 0, 0.6);
   }
   50% {
-    transform: scale(1.06);
-    box-shadow: 
-      0 16px 45px rgba(0, 0, 0, 0.95),
-      0 0 45px rgba(255, 215, 0, 0.9);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 215, 0, 0.9);
   }
 }
 
@@ -1081,12 +1086,11 @@ body {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
 }
 
 .card-tap-btn:hover {
-  transform: scale(1.08) translateY(-2px);
   background: linear-gradient(135deg, #dfb76c 0%, #ffffff 45%, #ffd700 80%, #b38422 100%);
   box-shadow: 
     0 18px 50px rgba(0, 0, 0, 0.95),
@@ -1096,8 +1100,9 @@ body {
 @media (max-width: 600px) {
   .card-tap-btn {
     padding: 12px 28px;
-    font-size: 1.08rem;
-    letter-spacing: 2px;
+    font-size: 1.05rem;
+    letter-spacing: 1.5px;
+    bottom: 35px;
   }
   .card-tap-btn .tap-icon {
     font-size: 1.15rem;

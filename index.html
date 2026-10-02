@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Custom Styles (with Cache Buster) -->
-  <link rel="stylesheet" href="css/style.css?v=5.0">
+  <link rel="stylesheet" href="css/style.css?v=6.0">
 </head>
 <body>
 
@@ -347,8 +347,11 @@
         <!-- ============================================== -->
         <!-- ROYAL CENTER GOLDEN WAX SEAL (Opens Card)     -->
         <!-- ============================================== -->
-        <div class="wax-seal-wrapper" id="waxSealWrapper" onclick="toggleCardFold()" title="Tap to Open Card">
-          <div class="wax-seal" id="waxSeal" onclick="toggleCardFold()">
+        <!-- ============================================== -->
+        <!-- ROYAL CENTER GOLDEN WAX SEAL (Opens Card)     -->
+        <!-- ============================================== -->
+        <div class="wax-seal-wrapper" id="waxSealWrapper" onclick="openCard()" title="Tap to Open Card">
+          <div class="wax-seal" id="waxSeal" onclick="openCard()">
             <div class="seal-inner-emboss">
               <span class="seal-arabic">بِسْمِ اللهِ</span>
               <span class="seal-initials">A &amp; J</span>
@@ -356,12 +359,12 @@
             </div>
             <div class="seal-glow-ring"></div>
           </div>
+        </div>
 
-          <!-- Big Prominent TAP Button directly under A&J Seal -->
-          <div class="card-tap-btn" id="cardTapBtn" onclick="toggleCardFold()" style="position: absolute; top: calc(100% + 28px); left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 34px; background: linear-gradient(135deg, #c59b27 0%, #fffadb 45%, #ffd700 80%, #977014 100%); color: #031c15; border: 2px solid #ffffff; border-radius: 50px; font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 12px 35px rgba(0,0,0,0.85), 0 0 25px rgba(255,215,0,0.7); white-space: nowrap; user-select: none;">
-            <i class="fa-solid fa-hand-pointer tap-icon" style="font-size: 1.35rem; color: #031c15;"></i>
-            <span>TAP TO OPEN</span>
-          </div>
+        <!-- Big Prominent TAP Button centered on card -->
+        <div class="card-tap-btn" id="cardTapBtn" onclick="openCard()" style="position: absolute; bottom: 42px; left: 0; right: 0; margin: 0 auto; width: fit-content; max-width: 85%; transform: translateZ(45px); z-index: 60; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px 34px; background: linear-gradient(135deg, #c59b27 0%, #fffadb 45%, #ffd700 80%, #977014 100%); color: #031c15; border: 2px solid #ffffff; border-radius: 50px; font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 12px 35px rgba(0,0,0,0.85), 0 0 25px rgba(255,215,0,0.7); white-space: nowrap; user-select: none;">
+          <i class="fa-solid fa-hand-pointer tap-icon" style="font-size: 1.35rem; color: #031c15;"></i>
+          <span>TAP TO OPEN</span>
         </div>
 
       </div>
@@ -568,6 +571,6 @@
   </div>
 
   <!-- Master Application Script (with Cache Buster) -->
-  <script src="js/app.js?v=5.0"></script>
+  <script src="js/app.js?v=6.0"></script>
 </body>
 </html>
