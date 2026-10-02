@@ -25,6 +25,11 @@
   <!-- 1. GUEST NAME ENTRY GATE (Displays before invitation)    -->
   <!-- ======================================================== -->
   <div class="guest-gate-screen" id="guestGateScreen">
+    <!-- Admin Portal Shortcut Button (Top Right of Entrance) -->
+    <button type="button" class="gate-admin-shortcut-btn" id="btnGateAdminTop" title="Open Admin Portal to Send Invites">
+      <i class="fa-solid fa-crown"></i> <span>Admin Portal</span>
+    </button>
+
     <div class="gate-overlay-particles"></div>
     <div class="guest-gate-card">
       <div class="gate-gold-border">
@@ -72,6 +77,13 @@
               <i class="fa-solid fa-envelope-open-text"></i>
             </button>
           </form>
+        </div>
+
+        <!-- Admin Portal Access Link -->
+        <div class="gate-admin-footer">
+          <button type="button" class="gate-admin-toggle-link" id="btnGateAdminBottom">
+            <i class="fa-solid fa-crown"></i> <span>Admin Portal: Create &amp; Send Invites</span>
+          </button>
         </div>
 
       </div>

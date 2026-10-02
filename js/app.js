@@ -763,10 +763,27 @@
     btnOpenWaSender.addEventListener('click', openModal);
     if (fabSendWa) fabSendWa.addEventListener('click', openModal);
 
+    const btnGateAdminTop = document.getElementById('btnGateAdminTop');
+    const btnGateAdminBottom = document.getElementById('btnGateAdminBottom');
+    if (btnGateAdminTop) btnGateAdminTop.addEventListener('click', openModal);
+    if (btnGateAdminBottom) btnGateAdminBottom.addEventListener('click', openModal);
+
     // Close Modal
     btnCloseWaSender.addEventListener('click', () => {
       waSenderModal.classList.remove('is-active');
     });
+
+    waSenderModal.addEventListener('click', (e) => {
+      if (e.target === waSenderModal) {
+        waSenderModal.classList.remove('is-active');
+      }
+    });
+
+    // Auto-open Admin Portal if ?admin=true or #admin in URL
+    const adminCheck = new URLSearchParams(window.location.search);
+    if (adminCheck.get('admin') === 'true' || adminCheck.get('portal') === 'admin' || window.location.hash === '#admin') {
+      setTimeout(openModal, 200);
+    }
 
     // Generate Personalized Message
     function buildPersonalizedInvite(relativeName, withFamily) {
