@@ -916,7 +916,6 @@
         : `${baseUrl}?name=${encodeURIComponent(cleanName)}`;
 
       const message = 
-        `✨ You’re Invited! ✨\n` +
         `Dear ${greeting},\n` +
         `We warmly invite you to join us on this special occasion. 💍✨\n` +
         `Please tap the link below to view your personalized wedding invitation:\n` +
@@ -953,15 +952,25 @@
       }
     });
 
-    // Form Submit: Open WhatsApp and save
+    // Form Submit: Open WhatsApp and save (Debounced)
+    let isSubmittingWa = false;
     waSenderForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const relativeName = inputWaRelativeName.value.trim();
+      if (isSubmittingWa) return;
 
+      const relativeName = inputWaRelativeName.value.trim();
       if (!relativeName) return;
+
+      isSubmittingWa = true;
+      const btnSubmit = document.getElementById('btnSubmitWaSend');
+      if (btnSubmit) btnSubmit.disabled = true;
 
       const withFamily = checkWaWithFamily.checked;
       const { greeting, message, inviteUrl } = buildPersonalizedInvite(relativeName, withFamily);
+
+      // Launch WhatsApp (opens contact picker immediately)
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
 
       // Save to Sent Tracker
       saveSentRelative({
@@ -973,9 +982,10 @@
 
       renderSentRelatives();
 
-      // Launch WhatsApp (opens contact picker)
-      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-      window.open(waUrl, '_blank');
+      setTimeout(() => {
+        if (btnSubmit) btnSubmit.disabled = false;
+        isSubmittingWa = false;
+      }, 2500);
     });
 
     // Sent Tracker Storage Helpers

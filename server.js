@@ -6,7 +6,11 @@ const mysql = require('mysql2/promise');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Bypass-Tunnel-Reminder', 'bypass-tunnel-reminder']
+}));
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -137,6 +141,8 @@ app.post('/api/invitations', async (req, res) => {
         created_at: new Date()
       }
     });
+
+    syncGist();
   } catch (err) {
     console.error('Error inserting invitation into MySQL:', err);
     res.status(500).json({ error: err.message });
@@ -157,6 +163,7 @@ app.delete('/api/invitations/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM invitations WHERE id = ?', [id]);
     res.json({ success: true, message: `Invitation ${id} deleted from MySQL` });
+    syncGist();
   } catch (err) {
     console.error('Error deleting invitation from MySQL:', err);
     res.status(500).json({ error: err.message });
@@ -172,11 +179,44 @@ app.delete('/api/invitations', async (req, res) => {
   try {
     await pool.query('TRUNCATE TABLE invitations');
     res.json({ success: true, message: 'All invitation history cleared from MySQL' });
+    syncGist();
   } catch (err) {
     console.error('Error truncating invitations in MySQL:', err);
     res.status(500).json({ error: err.message });
   }
 });
+
+// Sync Gist backup helper
+const { exec } = require('child_process');
+const fs = require('fs');
+
+async function syncGist() {
+  if (!pool || !isConnected) return;
+  try {
+    const [rows] = await pool.query('SELECT * FROM invitations ORDER BY id DESC');
+    const formatted = rows.map(r => {
+      const dateObj = r.created_at ? new Date(r.created_at) : new Date();
+      return {
+        id: r.id,
+        name: r.name,
+        withFamily: Boolean(r.with_family),
+        greeting: r.greeting || (r.with_family ? `${r.name} with Family` : r.name),
+        inviteUrl: r.invite_url,
+        message: r.message,
+        date: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: dateObj.getTime()
+      };
+    });
+    const tmpPath = path.join('/tmp', 'juveriya_invitations.json');
+    fs.writeFileSync(tmpPath, JSON.stringify(formatted));
+    exec(`gh gist edit 22bf292d93eec0311a70d48436241829 -f invitations.json ${tmpPath}`, (err) => {
+      if (!err) console.log('✔ Gist synchronized with MySQL');
+    });
+  } catch (e) {
+    console.warn('Gist sync error:', e.message);
+  }
+}
 
 // Fallback to index.html for root
 app.get('/', (req, res) => {
