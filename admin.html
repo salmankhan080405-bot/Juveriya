@@ -1305,11 +1305,11 @@
     <div class="admin-card">
       <form id="adminInviteForm">
         
-        <!-- Relative Name -->
+        <!-- Guest Name -->
         <div class="form-group">
           <label class="form-label" for="relativeNameInput">
             <i class="fa-solid fa-user-tag"></i>
-            <span>Relative's Full Name</span>
+            <span>Guest's Name</span>
           </label>
           <input 
             type="text" 
@@ -1320,7 +1320,6 @@
             autocomplete="off"
             autofocus
           >
-          <div class="input-hint">This name will be locked on their royal entrance card.</div>
         </div>
 
         <!-- With Family Toggle -->
@@ -1812,7 +1811,7 @@
 
         const relativeName = relativeNameInput.value.trim();
         if (!relativeName) {
-          alert("Please enter the relative's name.");
+          alert("Please enter the guest's name.");
           relativeNameInput.focus();
           return;
         }
