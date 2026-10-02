@@ -98,10 +98,16 @@
   let currentRotateY = 0;
 
   // =========================================================================
-  // Guest Name Management & Personalization Flow
+  // Guest Name Management & Personalization Flow (Fixed by Admin)
   // =========================================================================
   function initGuestPersonalization() {
-    // 1. Check for URL parameters: e.g. ?name=Uncle+Tariq or ?guest=Salman
+    const gateRelativeView = document.getElementById('gateRelativeView');
+    const gateFallbackView = document.getElementById('gateFallbackView');
+    const gateGuestNameDisplay = document.getElementById('gateGuestNameDisplay');
+    const gateGuestFamilyDisplay = document.getElementById('gateGuestFamilyDisplay');
+    const btnEnterInvitation = document.getElementById('btnEnterInvitation');
+
+    // 1. Check for URL parameters: e.g. ?name=Salman+Khan&family=true
     const urlParams = new URLSearchParams(window.location.search);
     const paramName = urlParams.get('name') || urlParams.get('guest');
     const paramFamily = urlParams.get('family');
@@ -113,10 +119,8 @@
       initialName = paramName.trim();
       withFamily = paramFamily !== 'false' && paramFamily !== '0';
       setGuestInformation(initialName, withFamily);
-      gateGuestNameInput.value = initialName;
-      gateWithFamilyCheck.checked = withFamily;
     } else {
-      // 2. Check localStorage for previously typed name
+      // 2. Check localStorage for previously typed/assigned name
       const savedName = localStorage.getItem(GUEST_STORAGE_KEY);
       const savedFamily = localStorage.getItem(GUEST_FAMILY_KEY);
 
@@ -124,19 +128,37 @@
         initialName = savedName;
         withFamily = savedFamily === null ? true : savedFamily === 'true';
         setGuestInformation(initialName, withFamily);
-        gateGuestNameInput.value = initialName;
-        gateWithFamilyCheck.checked = withFamily;
       }
     }
 
-    // ALWAYS display this welcome gate screen as the main webpage on refresh / load
-    guestGateScreen.classList.remove('is-hidden');
-    setTimeout(() => {
-      gateGuestNameInput.focus();
-      if (gateGuestNameInput.value) {
-        gateGuestNameInput.select();
+    // If name is fixed by Admin or saved: Show the unchangeable royal relative view
+    if (initialName) {
+      if (gateRelativeView) gateRelativeView.style.display = 'flex';
+      if (gateFallbackView) gateFallbackView.style.display = 'none';
+      if (gateGuestNameDisplay) gateGuestNameDisplay.textContent = initialName;
+      if (gateGuestFamilyDisplay) {
+        gateGuestFamilyDisplay.textContent = 'with Family';
+        gateGuestFamilyDisplay.style.display = withFamily ? 'inline-block' : 'none';
       }
-    }, 250);
+    } else {
+      // Fallback only if someone visits without any link/name
+      if (gateRelativeView) gateRelativeView.style.display = 'none';
+      if (gateFallbackView) gateFallbackView.style.display = 'block';
+    }
+
+    // Always display this welcome gate screen as the main webpage on load/refresh
+    guestGateScreen.classList.remove('is-hidden');
+
+    // Wire the Open button for the fixed relative view
+    if (btnEnterInvitation) {
+      btnEnterInvitation.onclick = function () {
+        guestGateScreen.classList.add('is-hidden');
+        playUnfoldSound();
+        if (!isAudioPlaying) {
+          startAmbientMelody();
+        }
+      };
+    }
   }
 
   function setGuestInformation(name, withFamily) {
@@ -159,18 +181,16 @@
 
   function handleGateSubmit(e) {
     e.preventDefault();
-    const enteredName = gateGuestNameInput.value.trim();
-    const withFamily = gateWithFamilyCheck.checked;
+    const gateInput = document.getElementById('gateGuestNameInput');
+    const enteredName = gateInput ? gateInput.value.trim() : '';
 
     if (!enteredName) return;
 
-    setGuestInformation(enteredName, withFamily);
+    setGuestInformation(enteredName, true);
 
-    // Smooth transition from gate screen to invitation
     guestGateScreen.classList.add('is-hidden');
     playUnfoldSound();
 
-    // Start ambient music since user interacted
     if (!isAudioPlaying) {
       startAmbientMelody();
     }
@@ -754,9 +774,15 @@
       const cleanName = relativeName.trim() || 'Relative Name';
       const greeting = withFamily ? `${cleanName} with Family` : cleanName;
       
-      // Determine invite URL
-      const currentUrl = window.location.href.split('?')[0];
-      const inviteUrl = `${currentUrl}?name=${encodeURIComponent(cleanName)}`;
+      // Determine invite URL (Always ensures a valid live web link for WhatsApp)
+      let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
+      const isLocal = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' || 
+                      window.location.protocol === 'file:';
+      if (!isLocal && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+        baseUrl = window.location.origin + window.location.pathname;
+      }
+      const inviteUrl = `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=${withFamily ? 'true' : 'false'}`;
 
       const message = 
         `✨ *Royal Wedding Invitation* ✨\n\n` +

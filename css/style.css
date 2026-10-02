@@ -179,6 +179,100 @@ body {
   line-height: 1.4;
 }
 
+/* Personalized Unchangeable Relative View on Gate */
+.gate-relative-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 6px;
+  width: 100%;
+}
+
+.gate-cordial-line {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-champagne);
+  opacity: 0.9;
+}
+
+.gate-relative-nameplate {
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(17, 87, 67, 0.75) 0%, rgba(3, 28, 21, 0.95) 85%),
+    #031c15;
+  border: 1.5px solid var(--color-gold-primary);
+  border-radius: 14px;
+  padding: 16px 24px;
+  width: 100%;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.7),
+    0 0 18px rgba(223, 183, 108, 0.25),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.gate-relative-name {
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #fffadb 0%, #dfb76c 40%, #ffd700 70%, #977014 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 8px rgba(223, 183, 108, 0.3);
+  text-align: center;
+}
+
+.gate-relative-family {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--color-gold-light);
+  background: rgba(223, 183, 108, 0.15);
+  border: 1px solid rgba(223, 183, 108, 0.4);
+  padding: 3px 14px;
+  border-radius: 16px;
+  display: inline-block;
+}
+
+.nav-btn-admin {
+  background: linear-gradient(135deg, rgba(223, 183, 108, 0.25) 0%, rgba(151, 112, 20, 0.4) 100%);
+  border-color: var(--color-gold-primary);
+  color: var(--color-gold-light);
+}
+
+.nav-btn-admin i {
+  color: var(--color-gold-bright);
+}
+
+.nav-btn-admin:hover {
+  background: linear-gradient(135deg, #dfb76c 0%, #ffe49e 50%, #977014 100%);
+  color: #031c15;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+}
+
+.nav-btn-admin:hover i {
+  color: #031c15;
+}
+
+.gold-crown {
+  color: var(--color-gold-bright);
+}
+
+.admin-family-setting {
+  background: rgba(3, 28, 21, 0.6);
+  border: 1px solid rgba(223, 183, 108, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
 .gate-guest-form {
   display: flex;
   flex-direction: column;

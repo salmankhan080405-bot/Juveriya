@@ -40,38 +40,39 @@
         <div class="gate-wedding-badge">Royal Wedding Celebration</div>
         <h1 class="gate-couple-names">Abdul Hadi &amp; Juveriya</h1>
 
-        <div class="gate-prompt-box">
-          <p class="gate-prompt-text">Kindly enter your name to open your invitation:</p>
-        </div>
-
-        <!-- Name Input Form -->
-        <form id="guestGateForm" class="guest-gate-form">
-          <div class="gate-input-wrapper">
-            <i class="fa-solid fa-user-tag gate-input-icon"></i>
-            <input 
-              type="text" 
-              id="gateGuestNameInput" 
-              class="gate-guest-input" 
-              placeholder="Enter your name (e.g. Mohammed Salman)" 
-              required
-              autocomplete="name"
-              autofocus
-            >
+        <!-- State 1: Personalized Relative View (Fixed by Admin - No editing, No checkbox!) -->
+        <div class="gate-relative-view" id="gateRelativeView">
+          <p class="gate-cordial-line">Cordially Inviting Our Respected Guest</p>
+          <div class="gate-relative-nameplate">
+            <h2 class="gate-relative-name" id="gateGuestNameDisplay">Honored Guest</h2>
+            <span class="gate-relative-family" id="gateGuestFamilyDisplay">with Family</span>
           </div>
-
-          <div class="gate-checkbox-wrapper">
-            <label class="gate-checkbox-label">
-              <input type="checkbox" id="gateWithFamilyCheck" checked>
-              <span class="custom-check-mark"></span>
-              <span>Include <strong class="gold-text">&ldquo;with Family&rdquo;</strong></span>
-            </label>
-          </div>
-
-          <button type="submit" class="gate-submit-btn" id="btnEnterInvitation">
+          <button type="button" class="gate-submit-btn" id="btnEnterInvitation">
             <span>Enter &amp; Open Invitation</span>
             <i class="fa-solid fa-envelope-open-text"></i>
           </button>
-        </form>
+        </div>
+
+        <!-- State 2: Fallback View (Only shown if opened without a personalized link) -->
+        <div class="gate-fallback-view" id="gateFallbackView" style="display: none;">
+          <p class="gate-prompt-text">Kindly enter your name to open your invitation:</p>
+          <form id="guestGateForm" class="guest-gate-form">
+            <div class="gate-input-wrapper">
+              <i class="fa-solid fa-user-tag gate-input-icon"></i>
+              <input 
+                type="text" 
+                id="gateGuestNameInput" 
+                class="gate-guest-input" 
+                placeholder="Enter your name" 
+                required
+              >
+            </div>
+            <button type="submit" class="gate-submit-btn">
+              <span>Enter &amp; Open Invitation</span>
+              <i class="fa-solid fa-envelope-open-text"></i>
+            </button>
+          </form>
+        </div>
 
       </div>
     </div>
@@ -104,11 +105,8 @@
       <button class="nav-btn" id="btnGalleryToggle" title="View 3D Studio Mockup Gallery">
         <i class="fa-solid fa-camera"></i> <span class="btn-text">3D Photos</span>
       </button>
-      <button class="nav-btn nav-btn-primary" id="btnCustomizeToggle" title="Customize Card Details">
-        <i class="fa-solid fa-pen-nib"></i> <span class="btn-text">Edit Details</span>
-      </button>
-      <button class="nav-btn nav-btn-wa" id="btnOpenWaSender" title="Send WhatsApp Invitation by Mobile Number">
-        <i class="fa-brands fa-whatsapp"></i> <span class="btn-text">Send Invite</span>
+      <button class="nav-btn nav-btn-admin" id="btnOpenWaSender" title="Admin: Send WhatsApp Invitation to Relatives">
+        <i class="fa-solid fa-crown"></i> <span class="btn-text">Admin: Send Invites</span>
       </button>
     </div>
   </header>
@@ -128,9 +126,6 @@
           <span id="displayBannerGuestName">Honored Guest</span>
           <span class="family-badge" id="displayBannerFamilyTag">with Family</span>
         </h2>
-        <button class="btn-edit-guest" id="btnEditGuestName" title="Change Guest Name">
-          <i class="fa-solid fa-user-pen"></i> <span>Change</span>
-        </button>
       </div>
     </div>
 
@@ -398,9 +393,9 @@
         <i class="fa-solid fa-map-location-dot"></i>
         <span>Venues</span>
       </button>
-      <button class="fab-btn fab-wa" id="fabSendWa" title="Send WhatsApp Invite by Phone Number">
-        <i class="fa-brands fa-whatsapp"></i>
-        <span>WhatsApp</span>
+      <button class="fab-btn fab-wa" id="fabSendWa" title="Admin: Send WhatsApp Invite to Relatives">
+        <i class="fa-solid fa-crown"></i>
+        <span>Admin Invites</span>
       </button>
     </div>
   </main>
@@ -545,12 +540,12 @@
   <div class="modal-backdrop" id="waSenderModal">
     <div class="modal-card modal-wa-sender">
       <div class="modal-header">
-        <h3><i class="fa-brands fa-whatsapp"></i> Send WhatsApp Invitation</h3>
+        <h3><i class="fa-solid fa-crown" style="color: var(--color-gold-bright);"></i> Admin: Send WhatsApp Invites</h3>
         <button class="modal-close" id="btnCloseWaSender">&times;</button>
       </div>
       <div class="modal-body">
         <p class="modal-desc">
-          Enter your relative's name and mobile number below. When you tap <strong>Send on WhatsApp</strong>, it opens their WhatsApp chat with their personal link so their name is filled in automatically!
+          As <strong>Admin</strong>, enter your relative's name and choose whether to include <strong>&ldquo;with Family&rdquo;</strong>. Enter their mobile number to send the invitation directly via your WhatsApp. The generated link locks their name so your relative cannot edit it!
         </p>
 
         <form id="waSenderForm">
