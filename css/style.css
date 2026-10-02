@@ -241,76 +241,6 @@ body {
   display: inline-block;
 }
 
-/* Gate Screen Admin Controls */
-.gate-admin-shortcut-btn {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  z-index: 10000;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  background: rgba(3, 28, 21, 0.9);
-  border: 1.5px solid var(--color-gold-primary);
-  border-radius: 30px;
-  color: var(--color-gold-light);
-  font-family: var(--font-sans);
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 12px rgba(223, 183, 108, 0.3);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.gate-admin-shortcut-btn i {
-  color: var(--color-gold-bright);
-}
-
-.gate-admin-shortcut-btn:hover {
-  background: linear-gradient(135deg, #dfb76c 0%, #ffe49e 50%, #977014 100%);
-  color: #031c15;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-  transform: translateY(-2px);
-}
-
-.gate-admin-shortcut-btn:hover i {
-  color: #031c15;
-}
-
-.gate-admin-footer {
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px dashed rgba(223, 183, 108, 0.25);
-  text-align: center;
-}
-
-.gate-admin-toggle-link {
-  background: transparent;
-  border: none;
-  color: var(--color-gold-champagne);
-  font-family: var(--font-sans);
-  font-size: 0.82rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  transition: all 0.25s ease;
-}
-
-.gate-admin-toggle-link i {
-  color: var(--color-gold-bright);
-}
-
-.gate-admin-toggle-link:hover {
-  color: var(--color-gold-bright);
-  background: rgba(223, 183, 108, 0.15);
-  text-decoration: underline;
-}
-
 .nav-btn-admin {
   background: linear-gradient(135deg, rgba(223, 183, 108, 0.25) 0%, rgba(151, 112, 20, 0.4) 100%);
   border-color: var(--color-gold-primary);
@@ -507,6 +437,7 @@ body {
   border: 1px solid var(--color-gold-border);
   border-radius: 30px;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
@@ -1466,6 +1397,7 @@ body {
   padding: 8px 14px;
   border-radius: 20px;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.25s ease;
 }
 

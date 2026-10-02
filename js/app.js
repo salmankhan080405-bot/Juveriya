@@ -101,6 +101,13 @@
   // Guest Name Management & Personalization Flow (Fixed by Admin)
   // =========================================================================
   function initGuestPersonalization() {
+    // If Admin portal requested via ?admin=true or #admin, redirect directly to dedicated admin portal
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === 'true' || urlParams.get('portal') === 'admin' || window.location.hash === '#admin') {
+      window.location.replace('admin.html');
+      return;
+    }
+
     const gateRelativeView = document.getElementById('gateRelativeView');
     const gateFallbackView = document.getElementById('gateFallbackView');
     const gateGuestNameDisplay = document.getElementById('gateGuestNameDisplay');
@@ -108,7 +115,6 @@
     const btnEnterInvitation = document.getElementById('btnEnterInvitation');
 
     // 1. Check for URL parameters: e.g. ?name=Salman+Khan&family=true
-    const urlParams = new URLSearchParams(window.location.search);
     const paramName = urlParams.get('name') || urlParams.get('guest');
     const paramFamily = urlParams.get('family');
 
@@ -760,29 +766,13 @@
       setTimeout(() => inputWaRelativeName.focus(), 250);
     }
 
-    btnOpenWaSender.addEventListener('click', openModal);
-    if (fabSendWa) fabSendWa.addEventListener('click', openModal);
-
-    const btnGateAdminTop = document.getElementById('btnGateAdminTop');
-    const btnGateAdminBottom = document.getElementById('btnGateAdminBottom');
-    if (btnGateAdminTop) btnGateAdminTop.addEventListener('click', openModal);
-    if (btnGateAdminBottom) btnGateAdminBottom.addEventListener('click', openModal);
-
-    // Close Modal
-    btnCloseWaSender.addEventListener('click', () => {
-      waSenderModal.classList.remove('is-active');
+    btnOpenWaSender.addEventListener('click', () => {
+      window.location.href = 'admin.html';
     });
-
-    waSenderModal.addEventListener('click', (e) => {
-      if (e.target === waSenderModal) {
-        waSenderModal.classList.remove('is-active');
-      }
-    });
-
-    // Auto-open Admin Portal if ?admin=true or #admin in URL
-    const adminCheck = new URLSearchParams(window.location.search);
-    if (adminCheck.get('admin') === 'true' || adminCheck.get('portal') === 'admin' || window.location.hash === '#admin') {
-      setTimeout(openModal, 200);
+    if (fabSendWa) {
+      fabSendWa.addEventListener('click', () => {
+        window.location.href = 'admin.html';
+      });
     }
 
     // Generate Personalized Message

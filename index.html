@@ -25,11 +25,6 @@
   <!-- 1. GUEST NAME ENTRY GATE (Displays before invitation)    -->
   <!-- ======================================================== -->
   <div class="guest-gate-screen" id="guestGateScreen">
-    <!-- Admin Portal Shortcut Button (Top Right of Entrance) -->
-    <button type="button" class="gate-admin-shortcut-btn" id="btnGateAdminTop" title="Open Admin Portal to Send Invites">
-      <i class="fa-solid fa-crown"></i> <span>Admin Portal</span>
-    </button>
-
     <div class="gate-overlay-particles"></div>
     <div class="guest-gate-card">
       <div class="gate-gold-border">
@@ -79,13 +74,6 @@
           </form>
         </div>
 
-        <!-- Admin Portal Access Link -->
-        <div class="gate-admin-footer">
-          <button type="button" class="gate-admin-toggle-link" id="btnGateAdminBottom">
-            <i class="fa-solid fa-crown"></i> <span>Admin Portal: Create &amp; Send Invites</span>
-          </button>
-        </div>
-
       </div>
     </div>
   </div>
@@ -117,9 +105,9 @@
       <button class="nav-btn" id="btnGalleryToggle" title="View 3D Studio Mockup Gallery">
         <i class="fa-solid fa-camera"></i> <span class="btn-text">3D Photos</span>
       </button>
-      <button class="nav-btn nav-btn-admin" id="btnOpenWaSender" title="Admin: Send WhatsApp Invitation to Relatives">
-        <i class="fa-solid fa-crown"></i> <span class="btn-text">Admin: Send Invites</span>
-      </button>
+      <a href="admin.html" class="nav-btn nav-btn-admin" id="btnOpenWaSender" title="Admin: Send WhatsApp Invitation to Relatives">
+        <i class="fa-solid fa-crown"></i> <span class="btn-text">Admin Portal</span>
+      </a>
     </div>
   </header>
 
@@ -405,10 +393,10 @@
         <i class="fa-solid fa-map-location-dot"></i>
         <span>Venues</span>
       </button>
-      <button class="fab-btn fab-wa" id="fabSendWa" title="Admin: Send WhatsApp Invite to Relatives">
+      <a href="admin.html" class="fab-btn fab-wa" id="fabSendWa" title="Admin: Send WhatsApp Invite to Relatives">
         <i class="fa-solid fa-crown"></i>
         <span>Admin Invites</span>
-      </button>
+      </a>
     </div>
   </main>
 

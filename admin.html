@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - Juveriya & Abdul Hadi Wedding Invites</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700;800&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    :root {
+      --color-emerald-deep: #031c15;
+      --color-emerald-card: #06281e;
+      --color-emerald-glow: #0d4e3b;
+      --color-gold-bright: #ffd700;
+      --color-gold-primary: #dfb76c;
+      --color-gold-light: #fffadb;
+      --color-gold-dark: #977014;
+      --color-gold-champagne: #faebd7;
+      --color-whatsapp: #25D366;
+      --color-whatsapp-dark: #128C7E;
+      --font-heading: 'Cinzel', serif;
+      --font-decorative: 'Cinzel Decorative', serif;
+      --font-arabic: 'Amiri', serif;
+      --font-body: 'Montserrat', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: 
+        radial-gradient(circle at 50% 10%, #0d4e3b 0%, #06281e 40%, #02120e 100%),
+        #031c15;
+      min-height: 100vh;
+      color: var(--color-gold-light);
+      font-family: var(--font-body);
+      padding: 24px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .admin-container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Top Navigation */
+    .admin-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: rgba(6, 40, 30, 0.85);
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      border-radius: 40px;
+      backdrop-filter: blur(12px);
+    }
+
+    .admin-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--color-gold-bright);
+    }
+
+    .admin-nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(223, 183, 108, 0.15);
+      border: 1px solid var(--color-gold-primary);
+      border-radius: 20px;
+      color: var(--color-gold-light);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.25s ease;
+    }
+
+    .admin-nav-link:hover {
+      background: var(--color-gold-primary);
+      color: #031c15;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Header Banner */
+    .admin-header-card {
+      text-align: center;
+      padding: 24px 20px;
+      background: radial-gradient(circle at 50% 20%, rgba(17, 87, 67, 0.6) 0%, rgba(6, 40, 30, 0.9) 70%, #031c15 100%);
+      border: 1.5px solid var(--color-gold-primary);
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .bismillah-arabic {
+      font-family: var(--font-arabic);
+      font-size: 2.2rem;
+      line-height: 1.3;
+      background: linear-gradient(180deg, #fffadb 0%, #dfb76c 60%, #977014 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .admin-title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(223, 183, 108, 0.25), rgba(151, 112, 20, 0.35));
+      border: 1px solid var(--color-gold-primary);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--color-gold-bright);
+      margin-bottom: 10px;
+    }
+
+    .admin-main-heading {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      color: var(--color-gold-light);
+      margin-bottom: 6px;
+    }
+
+    .admin-subheading {
+      font-size: 0.85rem;
+      color: var(--color-gold-champagne);
+      opacity: 0.85;
+      max-width: 460px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    /* Form Section */
+    .admin-card {
+      background: 
+        radial-gradient(circle at 50% 20%, rgba(13, 78, 59, 0.6) 0%, rgba(6, 40, 30, 0.95) 70%, #031c15 100%),
+        #06281e;
+      border: 1.5px solid var(--color-gold-primary);
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--color-gold-champagne);
+      margin-bottom: 8px;
+    }
+
+    .form-label i {
+      color: var(--color-gold-bright);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(3, 28, 21, 0.85);
+      border: 1.5px solid rgba(223, 183, 108, 0.4);
+      border-radius: 10px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.35);
+    }
+
+    .form-input::placeholder {
+      color: rgba(223, 183, 108, 0.45);
+      font-size: 0.88rem;
+    }
+
+    .input-hint {
+      font-size: 0.76rem;
+      color: var(--color-gold-champagne);
+      opacity: 0.7;
+      margin-top: 5px;
+    }
+
+    /* Checkbox option */
+    .checkbox-box {
+      background: rgba(3, 28, 21, 0.6);
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .checkbox-left input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--color-gold-primary);
+      cursor: pointer;
+    }
+
+    .checkbox-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .checkbox-sub {
+      font-size: 0.76rem;
+      color: var(--color-gold-champagne);
+      opacity: 0.8;
+    }
+
+    /* Generated Link Box */
+    .link-preview-box {
+      background: rgba(3, 28, 21, 0.9);
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .link-preview-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--color-gold-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .link-url-display {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: var(--color-gold-light);
+      word-break: break-all;
+      border: 1px dashed rgba(223, 183, 108, 0.25);
+      margin-bottom: 10px;
+    }
+
+    .link-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action-small {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-copy-link {
+      background: rgba(223, 183, 108, 0.15);
+      border: 1px solid var(--color-gold-primary);
+      color: var(--color-gold-light);
+    }
+
+    .btn-copy-link:hover {
+      background: rgba(223, 183, 108, 0.3);
+      color: #fff;
+    }
+
+    .btn-test-preview {
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.4);
+      color: #85f2ad;
+    }
+
+    .btn-test-preview:hover {
+      background: rgba(37, 211, 102, 0.3);
+      color: #fff;
+    }
+
+    /* WhatsApp Message Preview */
+    .wa-preview-card {
+      background: #0b141a;
+      border: 1px solid rgba(37, 211, 102, 0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 24px;
+    }
+
+    .wa-preview-header {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--color-whatsapp);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .wa-bubble {
+      background: #005c4b;
+      color: #e9edef;
+      padding: 12px 14px;
+      border-radius: 8px 8px 2px 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      white-space: pre-line;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Main WhatsApp Send Button */
+    .btn-send-whatsapp {
+      width: 100%;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      border: none;
+      border-radius: 35px;
+      color: #ffffff;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .btn-send-whatsapp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(37, 211, 102, 0.6);
+      background: linear-gradient(135deg, #2beb75 0%, #17a999 100%);
+    }
+
+    .btn-send-whatsapp i {
+      font-size: 1.4rem;
+    }
+
+    /* Sent Tracker Section */
+    .tracker-card {
+      background: rgba(6, 40, 30, 0.75);
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .tracker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .tracker-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-gold-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-clear-history {
+      background: transparent;
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      color: var(--color-gold-champagne);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-clear-history:hover {
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+    }
+
+    .sent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .sent-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(3, 28, 21, 0.8);
+      border: 1px solid rgba(223, 183, 108, 0.2);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .sent-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sent-item-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--color-gold-light);
+    }
+
+    .sent-item-family-tag {
+      font-size: 0.72rem;
+      color: var(--color-gold-primary);
+      font-style: italic;
+    }
+
+    .sent-item-phone {
+      font-size: 0.75rem;
+      color: var(--color-gold-champagne);
+      opacity: 0.75;
+    }
+
+    .sent-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-sent-resend {
+      background: rgba(37, 211, 102, 0.2);
+      border: 1px solid rgba(37, 211, 102, 0.4);
+      color: #85f2ad;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sent-resend:hover {
+      background: var(--color-whatsapp);
+      color: #031c15;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: rgba(223, 183, 108, 0.5);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    
+    <!-- Top Navigation -->
+    <header class="admin-nav">
+      <div class="admin-nav-brand">
+        <i class="fa-solid fa-crown"></i>
+        <span>Admin Invitation Studio</span>
+      </div>
+      <a href="index.html" class="admin-nav-link" id="linkBackToCard">
+        <span>View Live Invitation</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </header>
+
+    <!-- Header Banner -->
+    <div class="admin-header-card">
+      <div class="bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      <div class="admin-title-badge">
+        <i class="fa-solid fa-crown"></i>
+        <span>Admin Control Center</span>
+      </div>
+      <h1 class="admin-main-heading">Juveriya &amp; Abdul Hadi</h1>
+      <p class="admin-subheading">
+        Set your relative's name and choose whether to include <strong>&ldquo;with Family&rdquo;</strong>. Their link locks their name so guests cannot edit it!
+      </p>
+    </div>
+
+    <!-- Main Creation Card -->
+    <div class="admin-card">
+      <form id="adminInviteForm">
+        
+        <!-- Relative Name -->
+        <div class="form-group">
+          <label class="form-label" for="relativeNameInput">
+            <i class="fa-solid fa-user-tag"></i>
+            <span>Relative's Full Name</span>
+          </label>
+          <input 
+            type="text" 
+            id="relativeNameInput" 
+            class="form-input" 
+            placeholder="e.g. Saniya, Uncle Tariq, Mohd Basheer" 
+            required 
+            autocomplete="off"
+            autofocus
+          >
+          <div class="input-hint">This name will be locked on their royal entrance card.</div>
+        </div>
+
+        <!-- With Family Toggle -->
+        <div class="checkbox-box" id="familyToggleBox">
+          <div class="checkbox-left">
+            <input type="checkbox" id="withFamilyCheckbox" checked>
+            <div>
+              <div class="checkbox-title">Include &ldquo;with Family&rdquo;</div>
+              <div class="checkbox-sub">Card displays &ldquo;[Name] with Family&rdquo;</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-people-roof" style="color: var(--color-gold-bright); font-size: 1.2rem;"></i>
+        </div>
+
+        <!-- Mobile Number -->
+        <div class="form-group">
+          <label class="form-label" for="mobileNumberInput">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>Relative's WhatsApp Mobile Number</span>
+          </label>
+          <input 
+            type="tel" 
+            id="mobileNumberInput" 
+            class="form-input" 
+            placeholder="e.g. 9849012345 (10 digits)" 
+            required
+            autocomplete="tel"
+          >
+          <div class="input-hint">Indian 10-digit mobile numbers are automatically formatted with country code (+91).</div>
+        </div>
+
+        <!-- Generated Link Preview -->
+        <div class="link-preview-box">
+          <div class="link-preview-title">
+            <span><i class="fa-solid fa-link"></i> Generated Guest Link (Locked)</span>
+          </div>
+          <div class="link-url-display" id="displayInviteUrl">...</div>
+          <div class="link-actions">
+            <button type="button" class="btn-action-small btn-copy-link" id="btnCopyGeneratedLink">
+              <i class="fa-regular fa-copy"></i> Copy Link
+            </button>
+            <a href="#" target="_blank" class="btn-action-small btn-test-preview" id="btnPreviewAsGuest">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Card
+            </a>
+          </div>
+        </div>
+
+        <!-- WhatsApp Message Preview -->
+        <div class="wa-preview-card">
+          <div class="wa-preview-header">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>WhatsApp Invitation Message Preview:</span>
+          </div>
+          <div class="wa-bubble" id="waMessageBubble"></div>
+        </div>
+
+        <!-- Send Button -->
+        <button type="submit" class="btn-send-whatsapp" id="btnSubmitSend">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>Send Invitation via WhatsApp</span>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Sent Tracker -->
+    <div class="tracker-card">
+      <div class="tracker-header">
+        <div class="tracker-title">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Sent Relatives Tracker (<span id="trackerCount">0</span>)</span>
+        </div>
+        <button type="button" class="btn-clear-history" id="btnClearSentHistory">Clear History</button>
+      </div>
+
+      <div class="sent-list" id="sentRelativesList">
+        <!-- Populated via JavaScript -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'juveriya_wedding_card_data';
+      const WA_SENT_STORAGE_KEY = 'juveriya_sent_relatives_list';
+
+      const DEFAULT_DATA = {
+        groomName: 'Abdul Hadi',
+        brideName: 'Juveriya',
+        groomParents: '(S/o Mr. Abdul Basith)',
+        brideParents: '(D/o Mr. Mohd Jani Miya)',
+        baratTitle: 'Nikah',
+        baratDate: 'On 21st Nov 2025',
+        baratTime: '8:00 pm',
+        baratVenue: 'Falak Convention Hall,\nBalapur, Telangana.',
+        walimaTitle: 'Walima',
+        walimaDate: 'On 22nd Nov 2025',
+        walimaTime: '8:00 pm onwards',
+        walimaVenue: 'Koh-e-Toor Function Hall,\nGolconda, Hyderabad.',
+        rsvpContact: '+91 94403 94950',
+        familyCompliments: 'Near & Dear Family, Relatives & Friends'
+      };
+
+      function loadCardData() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          return saved ? Object.assign({}, DEFAULT_DATA, JSON.parse(saved)) : DEFAULT_DATA;
+        } catch (e) {
+          return DEFAULT_DATA;
+        }
+      }
+
+      // DOM Elements
+      const relativeNameInput = document.getElementById('relativeNameInput');
+      const withFamilyCheckbox = document.getElementById('withFamilyCheckbox');
+      const familyToggleBox = document.getElementById('familyToggleBox');
+      const mobileNumberInput = document.getElementById('mobileNumberInput');
+      const displayInviteUrl = document.getElementById('displayInviteUrl');
+      const btnCopyGeneratedLink = document.getElementById('btnCopyGeneratedLink');
+      const btnPreviewAsGuest = document.getElementById('btnPreviewAsGuest');
+      const waMessageBubble = document.getElementById('waMessageBubble');
+      const adminInviteForm = document.getElementById('adminInviteForm');
+      const sentRelativesList = document.getElementById('sentRelativesList');
+      const trackerCount = document.getElementById('trackerCount');
+      const btnClearSentHistory = document.getElementById('btnClearSentHistory');
+
+      // Click row to toggle checkbox
+      familyToggleBox.addEventListener('click', (e) => {
+        if (e.target !== withFamilyCheckbox) {
+          withFamilyCheckbox.checked = !withFamilyCheckbox.checked;
+          updatePreview();
+        }
+      });
+
+      // Build personalized invite URL and message
+      function getInviteData() {
+        const data = loadCardData();
+        const rawName = relativeNameInput.value.trim();
+        const cleanName = rawName || 'Saniya';
+        const withFamily = withFamilyCheckbox.checked;
+        const greeting = withFamily ? `${cleanName} with Family` : cleanName;
+
+        // Base URL for guest invitation (always points to index.html)
+        let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
+        const isLocal = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' || 
+                        window.location.protocol === 'file:';
+        if (!isLocal && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+          baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '').replace(/\/$/, '') + '/';
+        }
+
+        const inviteUrl = `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=${withFamily ? 'true' : 'false'}`;
+
+        const message = 
+          `✨ *Royal Wedding Invitation* ✨\n\n` +
+          `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n` +
+          `Dear *${greeting}*,\n\n` +
+          `The pleasure of your company is requested at the wedding celebration of:\n` +
+          `💍 *${data.groomName} & ${data.brideName}* 💍\n\n` +
+          `🌙 *${data.baratTitle}:*\n` +
+          `📅 ${data.baratDate} at ${data.baratTime}\n` +
+          `📍 ${data.baratVenue.replace(/\n/g, ' ')}\n\n` +
+          `🌟 *${data.walimaTitle}:*\n` +
+          `📅 ${data.walimaDate} at ${data.walimaTime}\n` +
+          `📍 ${data.walimaVenue.replace(/\n/g, ' ')}\n\n` +
+          `📞 Contact No: ${data.rsvpContact}\n\n` +
+          `Kindly tap your personalized invitation link below:\n` +
+          `👉 ${inviteUrl}`;
+
+        return { rawName, cleanName, withFamily, greeting, inviteUrl, message };
+      }
+
+      function updatePreview() {
+        const { inviteUrl, message } = getInviteData();
+        displayInviteUrl.textContent = inviteUrl;
+        btnPreviewAsGuest.href = inviteUrl;
+        waMessageBubble.textContent = message;
+      }
+
+      relativeNameInput.addEventListener('input', updatePreview);
+      withFamilyCheckbox.addEventListener('change', updatePreview);
+
+      // Copy Link
+      btnCopyGeneratedLink.addEventListener('click', () => {
+        const { inviteUrl } = getInviteData();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(inviteUrl).then(() => {
+            btnCopyGeneratedLink.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+            setTimeout(() => {
+              btnCopyGeneratedLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link';
+            }, 2000);
+          });
+        } else {
+          prompt('Copy link:', inviteUrl);
+        }
+      });
+
+      // Submit Form: Clean Phone & Open WhatsApp
+      adminInviteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const relativeName = relativeNameInput.value.trim();
+        let rawPhone = mobileNumberInput.value.trim().replace(/\D/g, '');
+
+        if (!relativeName) {
+          alert("Please enter the relative's name.");
+          relativeNameInput.focus();
+          return;
+        }
+
+        if (rawPhone.length === 10) {
+          rawPhone = '91' + rawPhone;
+        }
+
+        if (!rawPhone || rawPhone.length < 10) {
+          alert('Please enter a valid 10-digit mobile number.');
+          mobileNumberInput.focus();
+          return;
+        }
+
+        const withFamily = withFamilyCheckbox.checked;
+        const { message, inviteUrl } = getInviteData();
+
+        // Save to sent history
+        saveSentRelative({
+          name: relativeName,
+          phone: rawPhone,
+          withFamily: withFamily,
+          inviteUrl: inviteUrl,
+          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        renderSentList();
+
+        // Launch WhatsApp Direct Chat
+        const waUrl = `https://api.whatsapp.com/send?phone=${rawPhone}&text=${encodeURIComponent(message)}`;
+        window.open(waUrl, '_blank');
+      });
+
+      // Tracker Storage
+      function getSentRelatives() {
+        try {
+          const saved = localStorage.getItem(WA_SENT_STORAGE_KEY);
+          return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveSentRelative(item) {
+        const list = getSentRelatives();
+        const filtered = list.filter(x => x.phone !== item.phone);
+        filtered.unshift(item);
+        localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(filtered.slice(0, 50)));
+      }
+
+      function renderSentList() {
+        const list = getSentRelatives();
+        trackerCount.textContent = list.length;
+
+        if (list.length === 0) {
+          sentRelativesList.innerHTML = '<div class="empty-state">No invitations sent yet. Enter a name & mobile number above!</div>';
+          return;
+        }
+
+        sentRelativesList.innerHTML = list.map(item => `
+          <div class="sent-item">
+            <div class="sent-item-info">
+              <div class="sent-item-name">
+                ${item.name} 
+                ${item.withFamily ? '<span class="sent-item-family-tag">with Family</span>' : ''}
+              </div>
+              <div class="sent-item-phone">
+                <i class="fa-brands fa-whatsapp" style="color: var(--color-whatsapp);"></i> +${item.phone} &bull; ${item.date || ''}
+              </div>
+            </div>
+            <div class="sent-item-actions">
+              <button type="button" class="btn-sent-resend" data-name="${item.name}" data-phone="${item.phone}" data-family="${item.withFamily}">
+                Resend
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        // Wire Resend
+        sentRelativesList.querySelectorAll('.btn-sent-resend').forEach(btn => {
+          btn.addEventListener('click', () => {
+            relativeNameInput.value = btn.getAttribute('data-name');
+            mobileNumberInput.value = btn.getAttribute('data-phone');
+            withFamilyCheckbox.checked = btn.getAttribute('data-family') === 'true';
+            updatePreview();
+            adminInviteForm.dispatchEvent(new Event('submit'));
+          });
+        });
+      }
+
+      btnClearSentHistory.addEventListener('click', () => {
+        if (confirm('Clear sent invitations history?')) {
+          localStorage.removeItem(WA_SENT_STORAGE_KEY);
+          renderSentList();
+        }
+      });
+
+      // Initial setup
+      updatePreview();
+      renderSentList();
+
+    })();
+  </script>
+</body>
+</html>
