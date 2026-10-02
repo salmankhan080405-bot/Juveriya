@@ -78,6 +78,34 @@
       color: var(--color-gold-bright);
     }
 
+    .admin-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(223, 183, 108, 0.15);
+      border: 1px solid var(--color-gold-primary);
+      border-radius: 20px;
+      color: var(--color-gold-light);
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .admin-nav-btn:hover {
+      background: var(--color-gold-primary);
+      color: #031c15;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+
     .admin-nav-link {
       display: inline-flex;
       align-items: center;
@@ -98,6 +126,7 @@
       color: #031c15;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
     }
+
 
     /* Header Banner */
     .admin-header-card {
@@ -386,116 +415,459 @@
       font-size: 1.4rem;
     }
 
-    /* Sent Tracker Section */
-    .tracker-card {
-      background: rgba(6, 40, 30, 0.75);
-      border: 1px solid rgba(223, 183, 108, 0.3);
-      border-radius: 16px;
-      padding: 22px;
+    /* Invitation History Button */
+    .btn-invitation-history {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px 20px;
+      background: rgba(223, 183, 108, 0.12);
+      border: 1.5px solid var(--color-gold-primary);
+      border-radius: 30px;
+      color: var(--color-gold-light);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
 
-    .tracker-header {
+    .btn-invitation-history:hover {
+      background: rgba(223, 183, 108, 0.25);
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(223, 183, 108, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .history-count-badge, .tracker-count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-gold-bright);
+      color: #031c15;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: 4px;
+    }
+
+    /* Modal Backdrop */
+    .history-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(2, 18, 14, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .history-modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Modal Card */
+    .history-modal-card {
+      background: radial-gradient(circle at 50% 15%, rgba(13, 78, 59, 0.95) 0%, rgba(6, 40, 30, 0.98) 60%, #031c15 100%);
+      border: 1.5px solid var(--color-gold-primary);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(223, 183, 108, 0.2);
+      transform: scale(0.95) translateY(15px);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .history-modal-backdrop.active .history-modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Header */
+    .history-modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(223, 183, 108, 0.25);
+      background: rgba(3, 28, 21, 0.8);
     }
 
-    .tracker-title {
-      font-size: 0.95rem;
+    .history-modal-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--color-gold-bright);
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .btn-clear-history {
-      background: transparent;
-      border: 1px solid rgba(223, 183, 108, 0.3);
-      color: var(--color-gold-champagne);
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-clear-history:hover {
-      border-color: #ff6b6b;
-      color: #ff6b6b;
-    }
-
-    .sent-list {
-      display: flex;
-      flex-direction: column;
       gap: 10px;
-      max-height: 280px;
-      overflow-y: auto;
+      letter-spacing: 0.5px;
     }
 
-    .sent-item {
+    .btn-history-close {
+      background: transparent;
+      border: none;
+      color: var(--color-gold-champagne);
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 6px;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-history-close:hover {
+      color: #ff6b6b;
+      transform: scale(1.15);
+    }
+
+    /* Total Invitations Count Summary Bar */
+    .history-summary-box {
+      margin: 18px 22px 14px;
+      padding: 14px 20px;
+      background: rgba(3, 28, 21, 0.75);
+      border: 1px solid rgba(223, 183, 108, 0.35);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(3, 28, 21, 0.8);
-      border: 1px solid rgba(223, 183, 108, 0.2);
-      border-radius: 10px;
-      padding: 10px 14px;
+      gap: 16px;
     }
 
-    .sent-item-info {
+    .summary-metric-main {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .sent-item-name {
-      font-weight: 600;
-      font-size: 0.9rem;
+    .summary-metric-main .metric-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-gold-champagne);
+      opacity: 0.85;
+    }
+
+    .summary-metric-main .metric-value {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-gold-bright);
+      line-height: 1;
+    }
+
+    .summary-metric-divider {
+      width: 1px;
+      height: 38px;
+      background: rgba(223, 183, 108, 0.25);
+    }
+
+    .summary-metric-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.82rem;
       color: var(--color-gold-light);
     }
 
-    .sent-item-family-tag {
-      font-size: 0.72rem;
+    .summary-metric-sub .sub-metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .summary-metric-sub .sub-label {
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .summary-metric-sub strong {
       color: var(--color-gold-primary);
-      font-style: italic;
+      font-weight: 700;
     }
 
-    .sent-item-phone {
-      font-size: 0.75rem;
-      color: var(--color-gold-champagne);
-      opacity: 0.75;
+    /* Search Bar */
+    .history-search-bar {
+      margin: 0 22px 12px;
+      position: relative;
+      display: flex;
+      align-items: center;
     }
 
-    .sent-item-actions {
+    .history-search-bar i {
+      position: absolute;
+      left: 14px;
+      color: rgba(223, 183, 108, 0.6);
+      font-size: 0.88rem;
+    }
+
+    .history-search-bar input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      background: rgba(3, 28, 21, 0.8);
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .history-search-bar input:focus {
+      border-color: var(--color-gold-bright);
+    }
+
+    /* Relatives List Container */
+    .history-relatives-list {
+      flex: 1;
+      padding: 0 22px 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 380px;
+    }
+
+    .history-rel-item {
+      background: rgba(3, 28, 21, 0.85);
+      border: 1px solid rgba(223, 183, 108, 0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .history-rel-item:hover {
+      border-color: var(--color-gold-primary);
+    }
+
+    .history-rel-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .history-rel-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-gold-light);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .btn-sent-resend {
-      background: rgba(37, 211, 102, 0.2);
-      border: 1px solid rgba(37, 211, 102, 0.4);
-      color: #85f2ad;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.78rem;
+    .family-tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(223, 183, 108, 0.18);
+      border: 1px solid rgba(223, 183, 108, 0.4);
+      color: var(--color-gold-bright);
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
     }
 
-    .btn-sent-resend:hover {
+    .history-rel-details {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.78rem;
+      color: var(--color-gold-champagne);
+      opacity: 0.85;
+    }
+
+    .history-rel-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #85f2ad;
+      font-family: monospace;
+      font-size: 0.82rem;
+    }
+
+    .history-rel-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .history-rel-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(223, 183, 108, 0.15);
+    }
+
+    .btn-rel-action {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      color: var(--color-gold-light);
+      text-decoration: none;
+    }
+
+    .btn-rel-action:hover {
+      background: rgba(223, 183, 108, 0.25);
+      border-color: var(--color-gold-bright);
+    }
+
+    .btn-rel-resend {
+      background: rgba(37, 211, 102, 0.18);
+      border-color: rgba(37, 211, 102, 0.5);
+      color: #85f2ad;
+    }
+
+    .btn-rel-resend:hover {
       background: var(--color-whatsapp);
       color: #031c15;
     }
 
+    .btn-rel-delete {
+      color: #ff9e9e;
+      border-color: rgba(255, 107, 107, 0.3);
+      margin-left: auto;
+    }
+
+    .btn-rel-delete:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+      color: #ffffff;
+    }
+
+    /* Modal Footer */
+    .history-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 22px;
+      border-top: 1px solid rgba(223, 183, 108, 0.25);
+      background: rgba(3, 28, 21, 0.95);
+    }
+
+    .btn-export-csv {
+      padding: 9px 16px;
+      background: rgba(223, 183, 108, 0.15);
+      border: 1px solid var(--color-gold-primary);
+      border-radius: 8px;
+      color: var(--color-gold-light);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-export-csv:hover {
+      background: var(--color-gold-primary);
+      color: #031c15;
+    }
+
+    .btn-clear-db {
+      padding: 9px 14px;
+      background: transparent;
+      border: 1px solid rgba(255, 107, 107, 0.4);
+      border-radius: 8px;
+      color: #ff9e9e;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-clear-db:hover {
+      background: rgba(255, 107, 107, 0.2);
+      color: #fff;
+    }
+
+    /* Toast Notification */
+    .db-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #06281e 0%, #0d4e3b 100%);
+      border: 1.5px solid var(--color-gold-bright);
+      color: var(--color-gold-light);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      z-index: 10001;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+    }
+
+    .db-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .db-toast i {
+      color: var(--color-gold-bright);
+      font-size: 1.1rem;
+    }
+
     .empty-state {
       text-align: center;
-      padding: 24px;
-      color: rgba(223, 183, 108, 0.5);
-      font-size: 0.85rem;
+      padding: 32px 20px;
+      color: rgba(223, 183, 108, 0.55);
+      font-size: 0.88rem;
+    }
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      display: block;
+      color: rgba(223, 183, 108, 0.35);
     }
   </style>
 </head>
@@ -509,10 +881,16 @@
         <i class="fa-solid fa-crown"></i>
         <span>Admin Invitation Studio</span>
       </div>
-      <a href="index.html" class="admin-nav-link" id="linkBackToCard">
-        <span>View Live Invitation</span>
-        <i class="fa-solid fa-arrow-right"></i>
-      </a>
+      <div class="admin-nav-actions">
+        <button type="button" class="admin-nav-btn" id="btnNavHistory">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>History (<span class="tracker-count-badge" id="navTrackerCount">0</span>)</span>
+        </button>
+        <a href="index.html" class="admin-nav-link" id="linkBackToCard">
+          <span>View Live Invitation</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
     </header>
 
     <!-- Header Banner -->
@@ -523,9 +901,6 @@
         <span>Admin Control Center</span>
       </div>
       <h1 class="admin-main-heading">Juveriya &amp; Abdul Hadi</h1>
-      <p class="admin-subheading">
-        Set your relative's name and choose whether to include <strong>&ldquo;&amp; FAMILY&rdquo;</strong>. Their link locks their name so guests cannot edit it!
-      </p>
     </div>
 
     <!-- Main Creation Card -->
@@ -555,8 +930,8 @@
           <div class="checkbox-left">
             <input type="checkbox" id="withFamilyCheckbox" checked>
             <div>
-              <div class="checkbox-title">Include &ldquo;&amp; FAMILY&rdquo;</div>
-              <div class="checkbox-sub">Card displays &ldquo;[Name] &amp; FAMILY&rdquo;</div>
+              <div class="checkbox-title">Include &ldquo;with Family&rdquo;</div>
+              <div class="checkbox-sub">Card displays &ldquo;[Name] with Family&rdquo;</div>
             </div>
           </div>
           <i class="fa-solid fa-people-roof" style="color: var(--color-gold-bright); font-size: 1.2rem;"></i>
@@ -610,24 +985,79 @@
           <span>Send Invitation via WhatsApp</span>
         </button>
 
+        <!-- View Invitation History Button -->
+        <button type="button" class="btn-invitation-history" id="btnOpenHistory">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Invitation History</span>
+          <span class="history-count-badge" id="btnHistoryBadge">0</span>
+        </button>
+
       </form>
     </div>
 
-    <!-- Sent Tracker -->
-    <div class="tracker-card">
-      <div class="tracker-header">
-        <div class="tracker-title">
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: Invitation History & Stored Database             -->
+  <!-- ======================================================== -->
+  <div class="history-modal-backdrop" id="historyModal">
+    <div class="history-modal-card">
+      
+      <div class="history-modal-header">
+        <div class="history-modal-title">
           <i class="fa-solid fa-clock-rotate-left"></i>
-          <span>Sent Relatives Tracker (<span id="trackerCount">0</span>)</span>
+          <span>Invitation History (<span id="modalHistoryCount">0</span>)</span>
         </div>
-        <button type="button" class="btn-clear-history" id="btnClearSentHistory">Clear History</button>
+        <button type="button" class="btn-history-close" id="btnCloseHistory" aria-label="Close History">&times;</button>
       </div>
 
-      <div class="sent-list" id="sentRelativesList">
-        <!-- Populated via JavaScript -->
+      <!-- Total Invitations Count Summary Bar -->
+      <div class="history-summary-box">
+        <div class="summary-metric-main">
+          <div class="metric-label">Total Invitations Sent</div>
+          <div class="metric-value" id="historyTotalCount">0</div>
+        </div>
+        <div class="summary-metric-divider"></div>
+        <div class="summary-metric-sub">
+          <div class="sub-metric">
+            <span class="sub-label"><i class="fa-solid fa-people-roof"></i> With Family:</span>
+            <strong id="historyFamilyCount">0</strong>
+          </div>
+          <div class="sub-metric">
+            <span class="sub-label"><i class="fa-solid fa-user"></i> Individual:</span>
+            <strong id="historyIndividualCount">0</strong>
+          </div>
+        </div>
       </div>
+
+      <!-- Search Bar -->
+      <div class="history-search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="historySearchInput" placeholder="Search relatives by name or phone...">
+      </div>
+
+      <!-- Relatives List -->
+      <div class="history-relatives-list" id="historyRelativesList">
+        <!-- Dynamically populated from Database -->
+      </div>
+
+      <!-- History Footer Actions -->
+      <div class="history-footer">
+        <button type="button" class="btn-export-csv" id="btnExportCsv">
+          <i class="fa-solid fa-file-excel"></i> Export Relatives (CSV)
+        </button>
+        <button type="button" class="btn-clear-db" id="btnClearHistoryDb">
+          <i class="fa-solid fa-trash-can"></i> Clear History
+        </button>
+      </div>
+
     </div>
+  </div>
 
+  <!-- Database Saved Toast -->
+  <div class="db-toast" id="dbToast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="dbToastText">Saved to Database! Opening WhatsApp...</span>
   </div>
 
   <script>
@@ -636,6 +1066,10 @@
 
       const STORAGE_KEY = 'juveriya_wedding_card_data';
       const WA_SENT_STORAGE_KEY = 'juveriya_sent_relatives_list';
+      const DB_NAME = 'JuveriyaWeddingDB';
+      const DB_VERSION = 1;
+      const STORE_NAME = 'invitations';
+      const DB_BACKUP_KEY = 'juveriya_sent_relatives_database';
 
       const DEFAULT_DATA = {
         groomName: 'Abdul Hadi',
@@ -663,7 +1097,207 @@
         }
       }
 
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // ========================================================
+      // Robust IndexedDB Database Implementation + LocalStorage Sync
+      // ========================================================
+      class InvitationDatabase {
+        constructor() {
+          this.db = null;
+          this.readyPromise = this.init();
+        }
+
+        async init() {
+          return new Promise((resolve) => {
+            if (!window.indexedDB) {
+              console.warn('IndexedDB not supported, falling back to localStorage');
+              resolve(null);
+              return;
+            }
+            try {
+              const request = indexedDB.open(DB_NAME, DB_VERSION);
+              request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                  const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                  store.createIndex('phone', 'phone', { unique: false });
+                  store.createIndex('timestamp', 'timestamp', { unique: false });
+                }
+              };
+              request.onsuccess = (e) => {
+                this.db = e.target.result;
+                this.migrateFromLocalStorage().then(() => resolve(this.db));
+              };
+              request.onerror = () => {
+                resolve(null);
+              };
+            } catch (err) {
+              resolve(null);
+            }
+          });
+        }
+
+        async migrateFromLocalStorage() {
+          try {
+            const oldRaw = localStorage.getItem(WA_SENT_STORAGE_KEY) || localStorage.getItem(DB_BACKUP_KEY);
+            if (oldRaw) {
+              const list = JSON.parse(oldRaw);
+              if (Array.isArray(list) && list.length > 0) {
+                const currentCount = await this.count();
+                if (currentCount === 0) {
+                  for (const item of list) {
+                    await this.save(item, false);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Migration error:', e);
+          }
+        }
+
+        async save(item, updateLocalStorage = true) {
+          await this.readyPromise;
+          const record = {
+            name: item.name || '',
+            phone: item.phone || '',
+            withFamily: !!item.withFamily,
+            greeting: item.greeting || (item.withFamily ? `${item.name} with Family` : item.name),
+            inviteUrl: item.inviteUrl || '',
+            message: item.message || '',
+            timestamp: item.timestamp || Date.now(),
+            date: item.date || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: item.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+
+          if (this.db) {
+            await new Promise((resolve) => {
+              try {
+                const tx = this.db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const index = store.index('phone');
+                const getReq = index.getAll(record.phone);
+                getReq.onsuccess = () => {
+                  const matches = getReq.result;
+                  if (matches && matches.length > 0) {
+                    record.id = matches[0].id;
+                    store.put(record);
+                  } else {
+                    store.add(record);
+                  }
+                };
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+              } catch (e) {
+                resolve(false);
+              }
+            });
+          }
+
+          if (updateLocalStorage) {
+            await this.syncToLocalStorage();
+          }
+          return record;
+        }
+
+        async getAll() {
+          await this.readyPromise;
+          if (this.db) {
+            return new Promise((resolve) => {
+              try {
+                const tx = this.db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => {
+                  const list = req.result || [];
+                  list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                  resolve(list);
+                };
+                req.onerror = () => resolve(this.getFromLocalStorage());
+              } catch (e) {
+                resolve(this.getFromLocalStorage());
+              }
+            });
+          }
+          return this.getFromLocalStorage();
+        }
+
+        async count() {
+          const list = await this.getAll();
+          return list.length;
+        }
+
+        async delete(id) {
+          await this.readyPromise;
+          if (this.db && id) {
+            await new Promise((resolve) => {
+              try {
+                const tx = this.db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                store.delete(Number(id));
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+              } catch (e) {
+                resolve(false);
+              }
+            });
+          }
+          const list = this.getFromLocalStorage().filter(x => x.id !== id);
+          localStorage.setItem(DB_BACKUP_KEY, JSON.stringify(list));
+          localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(list));
+          await this.syncToLocalStorage();
+        }
+
+        async clear() {
+          await this.readyPromise;
+          if (this.db) {
+            await new Promise((resolve) => {
+              try {
+                const tx = this.db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                store.clear();
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+              } catch (e) {
+                resolve(false);
+              }
+            });
+          }
+          localStorage.removeItem(DB_BACKUP_KEY);
+          localStorage.removeItem(WA_SENT_STORAGE_KEY);
+        }
+
+        getFromLocalStorage() {
+          try {
+            const raw = localStorage.getItem(DB_BACKUP_KEY) || localStorage.getItem(WA_SENT_STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return [];
+          }
+        }
+
+        async syncToLocalStorage() {
+          try {
+            const list = await this.getAll();
+            localStorage.setItem(DB_BACKUP_KEY, JSON.stringify(list));
+            localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(list));
+          } catch (e) {}
+        }
+      }
+
+      const db = new InvitationDatabase();
+
+      // ========================================================
       // DOM Elements
+      // ========================================================
       const relativeNameInput = document.getElementById('relativeNameInput');
       const withFamilyCheckbox = document.getElementById('withFamilyCheckbox');
       const familyToggleBox = document.getElementById('familyToggleBox');
@@ -673,25 +1307,55 @@
       const btnPreviewAsGuest = document.getElementById('btnPreviewAsGuest');
       const waMessageBubble = document.getElementById('waMessageBubble');
       const adminInviteForm = document.getElementById('adminInviteForm');
-      const sentRelativesList = document.getElementById('sentRelativesList');
-      const trackerCount = document.getElementById('trackerCount');
-      const btnClearSentHistory = document.getElementById('btnClearSentHistory');
 
-      // Click row to toggle checkbox
-      familyToggleBox.addEventListener('click', (e) => {
-        if (e.target !== withFamilyCheckbox) {
-          withFamilyCheckbox.checked = !withFamilyCheckbox.checked;
-          updatePreview();
-        }
-      });
+      // History & Modal Elements
+      const navTrackerCount = document.getElementById('navTrackerCount');
+      const btnNavHistory = document.getElementById('btnNavHistory');
+      const btnOpenHistory = document.getElementById('btnOpenHistory');
+      const btnHistoryBadge = document.getElementById('btnHistoryBadge');
+      const historyModal = document.getElementById('historyModal');
+      const modalHistoryCount = document.getElementById('modalHistoryCount');
+      const btnCloseHistory = document.getElementById('btnCloseHistory');
+      const historyTotalCount = document.getElementById('historyTotalCount');
+      const historyFamilyCount = document.getElementById('historyFamilyCount');
+      const historyIndividualCount = document.getElementById('historyIndividualCount');
+      const historySearchInput = document.getElementById('historySearchInput');
+      const historyRelativesList = document.getElementById('historyRelativesList');
+      const btnExportCsv = document.getElementById('btnExportCsv');
+      const btnClearHistoryDb = document.getElementById('btnClearHistoryDb');
+      const dbToast = document.getElementById('dbToast');
+      const dbToastText = document.getElementById('dbToastText');
 
-      // Build personalized invite URL and message
+      // Toast Notification
+      let toastTimer = null;
+      function showToast(message) {
+        if (!dbToast) return;
+        if (dbToastText) dbToastText.textContent = message;
+        dbToast.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          dbToast.classList.remove('show');
+        }, 3200);
+      }
+
+      // Checkbox click on wrapper
+      if (familyToggleBox) {
+        familyToggleBox.addEventListener('click', (e) => {
+          if (e.target !== withFamilyCheckbox) {
+            withFamilyCheckbox.checked = !withFamilyCheckbox.checked;
+            updatePreview();
+          }
+        });
+      }
+
+      // ========================================================
+      // Build Personalized Invite URL and Warm Invitation Message
+      // ========================================================
       function getInviteData() {
-        const data = loadCardData();
         const rawName = relativeNameInput.value.trim();
         const cleanName = rawName || 'Saniya';
         const withFamily = withFamilyCheckbox.checked;
-        const greeting = withFamily ? `${cleanName} & FAMILY` : cleanName;
+        const greeting = withFamily ? `${cleanName} with Family` : cleanName;
 
         // Base URL for guest invitation (always points to index.html)
         let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
@@ -705,19 +1369,10 @@
         const inviteUrl = `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=${withFamily ? 'true' : 'false'}`;
 
         const message = 
-          `✨ *Royal Wedding Invitation* ✨\n\n` +
-          `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n` +
-          `Dear *${greeting}*,\n\n` +
-          `The pleasure of your company is requested at the wedding celebration of:\n` +
-          `💍 *${data.groomName} & ${data.brideName}* 💍\n\n` +
-          `🌙 *${data.baratTitle}:*\n` +
-          `📅 ${data.baratDate} at ${data.baratTime}\n` +
-          `📍 ${data.baratVenue.replace(/\n/g, ' ')}\n\n` +
-          `🌟 *${data.walimaTitle}:*\n` +
-          `📅 ${data.walimaDate} at ${data.walimaTime}\n` +
-          `📍 ${data.walimaVenue.replace(/\n/g, ' ')}\n\n` +
-          `📞 Contact No: ${data.rsvpContact}\n\n` +
-          `Kindly tap your personalized invitation link below:\n` +
+          `✨ You’re Invited! ✨\n` +
+          `Dear ${greeting},\n` +
+          `We warmly invite you to join us on this special occasion. 💍✨\n` +
+          `Please tap the link below to view your personalized wedding invitation:\n` +
           `👉 ${inviteUrl}`;
 
         return { rawName, cleanName, withFamily, greeting, inviteUrl, message };
@@ -725,15 +1380,15 @@
 
       function updatePreview() {
         const { inviteUrl, message } = getInviteData();
-        displayInviteUrl.textContent = inviteUrl;
-        btnPreviewAsGuest.href = inviteUrl;
-        waMessageBubble.textContent = message;
+        if (displayInviteUrl) displayInviteUrl.textContent = inviteUrl;
+        if (btnPreviewAsGuest) btnPreviewAsGuest.href = inviteUrl;
+        if (waMessageBubble) waMessageBubble.textContent = message;
       }
 
       relativeNameInput.addEventListener('input', updatePreview);
       withFamilyCheckbox.addEventListener('change', updatePreview);
 
-      // Copy Link
+      // Copy Link Button
       btnCopyGeneratedLink.addEventListener('click', () => {
         const { inviteUrl } = getInviteData();
         if (navigator.clipboard) {
@@ -748,8 +1403,10 @@
         }
       });
 
-      // Submit Form: Clean Phone & Open WhatsApp
-      adminInviteForm.addEventListener('submit', (e) => {
+      // ========================================================
+      // Submit Form: Store in Database & Open WhatsApp Direct Chat
+      // ========================================================
+      adminInviteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const relativeName = relativeNameInput.value.trim();
         let rawPhone = mobileNumberInput.value.trim().replace(/\D/g, '');
@@ -771,91 +1428,233 @@
         }
 
         const withFamily = withFamilyCheckbox.checked;
-        const { message, inviteUrl } = getInviteData();
+        const { message, inviteUrl, greeting } = getInviteData();
 
-        // Save to sent history
-        saveSentRelative({
+        // 1. Store in IndexedDB Database
+        await db.save({
           name: relativeName,
           phone: rawPhone,
           withFamily: withFamily,
+          greeting: greeting,
           inviteUrl: inviteUrl,
-          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          message: message,
+          timestamp: Date.now(),
+          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
 
-        renderSentList();
+        // 2. Update real-time counts across UI
+        await updateCounters();
 
-        // Launch WhatsApp Direct Chat
+        // 3. Show Database confirmation toast
+        showToast(`Saved ${greeting} in Database! Opening WhatsApp...`);
+
+        // 4. Launch WhatsApp Direct Chat
         const waUrl = `https://api.whatsapp.com/send?phone=${rawPhone}&text=${encodeURIComponent(message)}`;
         window.open(waUrl, '_blank');
       });
 
-      // Tracker Storage
-      function getSentRelatives() {
-        try {
-          const saved = localStorage.getItem(WA_SENT_STORAGE_KEY);
-          return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-          return [];
+      // Update count badges
+      async function updateCounters() {
+        const count = await db.count();
+        if (navTrackerCount) navTrackerCount.textContent = count;
+        if (btnHistoryBadge) btnHistoryBadge.textContent = count;
+        if (modalHistoryCount) modalHistoryCount.textContent = count;
+      }
+
+      // ========================================================
+      // Invitation History Display & Search Logic
+      // ========================================================
+      async function renderHistoryList(filterText = '') {
+        const relatives = await db.getAll();
+        const total = relatives.length;
+        const withFamilyCount = relatives.filter(r => r.withFamily).length;
+        const individualCount = total - withFamilyCount;
+
+        // Update counts
+        if (navTrackerCount) navTrackerCount.textContent = total;
+        if (btnHistoryBadge) btnHistoryBadge.textContent = total;
+        if (modalHistoryCount) modalHistoryCount.textContent = total;
+        if (historyTotalCount) historyTotalCount.textContent = total;
+        if (historyFamilyCount) historyFamilyCount.textContent = withFamilyCount;
+        if (historyIndividualCount) historyIndividualCount.textContent = individualCount;
+
+        let filtered = relatives;
+        if (filterText) {
+          const q = filterText.toLowerCase();
+          filtered = relatives.filter(r => 
+            (r.name && r.name.toLowerCase().includes(q)) || 
+            (r.phone && r.phone.includes(q))
+          );
         }
-      }
 
-      function saveSentRelative(item) {
-        const list = getSentRelatives();
-        const filtered = list.filter(x => x.phone !== item.phone);
-        filtered.unshift(item);
-        localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(filtered.slice(0, 50)));
-      }
-
-      function renderSentList() {
-        const list = getSentRelatives();
-        trackerCount.textContent = list.length;
-
-        if (list.length === 0) {
-          sentRelativesList.innerHTML = '<div class="empty-state">No invitations sent yet. Enter a name & mobile number above!</div>';
+        if (filtered.length === 0) {
+          historyRelativesList.innerHTML = filterText 
+            ? '<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i>No relatives found matching "' + escapeHtml(filterText) + '"</div>'
+            : '<div class="empty-state"><i class="fa-solid fa-address-book"></i>No invitations stored in database yet.<br>Enter a name & mobile number above to send!</div>';
           return;
         }
 
-        sentRelativesList.innerHTML = list.map(item => `
-          <div class="sent-item">
-            <div class="sent-item-info">
-              <div class="sent-item-name">
-                ${item.name} 
-                ${item.withFamily ? '<span class="sent-item-family-tag">&amp; FAMILY</span>' : ''}
+        historyRelativesList.innerHTML = filtered.map(item => `
+          <div class="history-rel-item">
+            <div class="history-rel-top">
+              <div class="history-rel-name">
+                <i class="fa-solid fa-user" style="color: var(--color-gold-bright); font-size: 0.85rem;"></i>
+                <span>${escapeHtml(item.name)}</span>
+                ${item.withFamily ? '<span class="family-tag-badge"><i class="fa-solid fa-people-roof"></i> with Family</span>' : ''}
               </div>
-              <div class="sent-item-phone">
-                <i class="fa-brands fa-whatsapp" style="color: var(--color-whatsapp);"></i> +${item.phone} &bull; ${item.date || ''}
+              <div class="history-rel-phone">
+                <i class="fa-brands fa-whatsapp" style="color: var(--color-whatsapp);"></i> +${escapeHtml(item.phone)}
               </div>
             </div>
-            <div class="sent-item-actions">
-              <button type="button" class="btn-sent-resend" data-name="${item.name}" data-phone="${item.phone}" data-family="${item.withFamily}">
-                Resend
+            <div class="history-rel-details">
+              <span class="history-rel-time"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.date || '')} &bull; ${escapeHtml(item.time || '')}</span>
+            </div>
+            <div class="history-rel-actions">
+              <button type="button" class="btn-rel-action btn-rel-resend" data-name="${escapeHtml(item.name)}" data-phone="${escapeHtml(item.phone)}" data-family="${item.withFamily}">
+                <i class="fa-brands fa-whatsapp"></i> Resend
+              </button>
+              <button type="button" class="btn-rel-action btn-rel-copy" data-url="${escapeHtml(item.inviteUrl)}">
+                <i class="fa-regular fa-copy"></i> Copy Link
+              </button>
+              <a href="${escapeHtml(item.inviteUrl)}" target="_blank" class="btn-rel-action">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview
+              </a>
+              <button type="button" class="btn-rel-action btn-rel-delete" data-id="${item.id}" data-name="${escapeHtml(item.name)}" title="Delete from Database">
+                <i class="fa-regular fa-trash-can"></i> Delete
               </button>
             </div>
           </div>
         `).join('');
 
         // Wire Resend
-        sentRelativesList.querySelectorAll('.btn-sent-resend').forEach(btn => {
+        historyRelativesList.querySelectorAll('.btn-rel-resend').forEach(btn => {
           btn.addEventListener('click', () => {
+            const rawPhone = btn.getAttribute('data-phone') || '';
+            const phoneDisplay = rawPhone.startsWith('91') && rawPhone.length === 12 ? rawPhone.slice(2) : rawPhone;
             relativeNameInput.value = btn.getAttribute('data-name');
-            mobileNumberInput.value = btn.getAttribute('data-phone');
+            mobileNumberInput.value = phoneDisplay;
             withFamilyCheckbox.checked = btn.getAttribute('data-family') === 'true';
             updatePreview();
+            closeHistoryModal();
             adminInviteForm.dispatchEvent(new Event('submit'));
+          });
+        });
+
+        // Wire Copy Link
+        historyRelativesList.querySelectorAll('.btn-rel-copy').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const url = btn.getAttribute('data-url');
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(url).then(() => {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+              });
+            } else {
+              prompt('Copy link:', url);
+            }
+          });
+        });
+
+        // Wire Delete
+        historyRelativesList.querySelectorAll('.btn-rel-delete').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const name = btn.getAttribute('data-name');
+            const id = btn.getAttribute('data-id');
+            if (confirm(`Delete invitation record for "${name}" from database?`)) {
+              await db.delete(Number(id));
+              await renderHistoryList(historySearchInput ? historySearchInput.value.trim() : '');
+              showToast(`Deleted ${name} from database.`);
+            }
           });
         });
       }
 
-      btnClearSentHistory.addEventListener('click', () => {
-        if (confirm('Clear sent invitations history?')) {
-          localStorage.removeItem(WA_SENT_STORAGE_KEY);
-          renderSentList();
+      // Open / Close Modal
+      function openHistoryModal() {
+        if (!historyModal) return;
+        if (historySearchInput) historySearchInput.value = '';
+        renderHistoryList('');
+        historyModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeHistoryModal() {
+        if (!historyModal) return;
+        historyModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      if (btnOpenHistory) btnOpenHistory.addEventListener('click', openHistoryModal);
+      if (btnNavHistory) btnNavHistory.addEventListener('click', openHistoryModal);
+      if (btnCloseHistory) btnCloseHistory.addEventListener('click', closeHistoryModal);
+
+      // Close on backdrop click
+      if (historyModal) {
+        historyModal.addEventListener('click', (e) => {
+          if (e.target === historyModal) {
+            closeHistoryModal();
+          }
+        });
+      }
+
+      // Close on Escape key
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && historyModal && historyModal.classList.contains('active')) {
+          closeHistoryModal();
         }
       });
 
+      // Search Filter
+      if (historySearchInput) {
+        historySearchInput.addEventListener('input', (e) => {
+          renderHistoryList(e.target.value.trim());
+        });
+      }
+
+      // Export CSV
+      if (btnExportCsv) {
+        btnExportCsv.addEventListener('click', async () => {
+          const list = await db.getAll();
+          if (!list || list.length === 0) {
+            alert('No invitations in the database to export.');
+            return;
+          }
+          const headers = ['Relative Name', 'With Family', 'Mobile Number', 'Date Sent', 'Time Sent', 'Invitation Link'];
+          const rows = list.map(r => [
+            `"${(r.name || '').replace(/"/g, '""')}"`,
+            r.withFamily ? '"Yes"' : '"No"',
+            `"+${r.phone || ''}"`,
+            `"${r.date || ''}"`,
+            `"${r.time || ''}"`,
+            `"${(r.inviteUrl || '').replace(/"/g, '""')}"`
+          ]);
+          const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement('a');
+          link.setAttribute('href', encodedUri);
+          link.setAttribute('download', `Juveriya_Wedding_Invitations_${new Date().toISOString().slice(0, 10)}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      }
+
+      // Clear All History
+      if (btnClearHistoryDb) {
+        btnClearHistoryDb.addEventListener('click', async () => {
+          if (confirm('Are you sure you want to clear all invitations from the database? This cannot be undone.')) {
+            await db.clear();
+            await renderHistoryList('');
+            showToast('All invitation history cleared.');
+          }
+        });
+      }
+
       // Initial setup
       updatePreview();
-      renderSentList();
+      updateCounters();
 
     })();
   </script>

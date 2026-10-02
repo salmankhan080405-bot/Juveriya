@@ -900,8 +900,8 @@
     // Generate Personalized Message
     function buildPersonalizedInvite(relativeName, withFamily) {
       const data = loadCardData();
-      const cleanName = relativeName.trim() || 'Relative Name';
-      const greeting = withFamily ? `${cleanName} & FAMILY` : cleanName;
+      const cleanName = relativeName.trim() || 'Saniya';
+      const greeting = withFamily ? `${cleanName} with Family` : cleanName;
       
       // Determine invite URL (Always ensures a valid live web link for WhatsApp)
       let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
@@ -914,19 +914,10 @@
       const inviteUrl = `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=${withFamily ? 'true' : 'false'}`;
 
       const message = 
-        `✨ *Royal Wedding Invitation* ✨\n\n` +
-        `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n` +
-        `Dear *${greeting}*,\n\n` +
-        `The pleasure of your company is requested at the wedding celebration of:\n` +
-        `💍 *${data.groomName} & ${data.brideName}* 💍\n\n` +
-        `🌙 *${data.baratTitle}:*\n` +
-        `📅 ${data.baratDate} at ${data.baratTime}\n` +
-        `📍 ${data.baratVenue.replace(/\n/g, ' ')}\n\n` +
-        `🌟 *${data.walimaTitle}:*\n` +
-        `📅 ${data.walimaDate} at ${data.walimaTime}\n` +
-        `📍 ${data.walimaVenue.replace(/\n/g, ' ')}\n\n` +
-        `📞 Contact No: ${data.rsvpContact}\n\n` +
-        `Kindly tap your personalized invitation link below:\n` +
+        `✨ You’re Invited! ✨\n` +
+        `Dear ${greeting},\n` +
+        `We warmly invite you to join us on this special occasion. 💍✨\n` +
+        `Please tap the link below to view your personalized wedding invitation:\n` +
         `👉 ${inviteUrl}`;
 
       return { greeting, message, inviteUrl };
@@ -1032,7 +1023,7 @@
       container.innerHTML = list.map(item => `
         <div class="sent-relative-item">
           <div>
-            <div class="sent-rel-name">${item.name} ${item.withFamily ? '<span style="font-weight: normal; font-size: 0.72rem; color: var(--color-gold-champagne);">&amp; FAMILY</span>' : ''}</div>
+            <div class="sent-rel-name">${item.name} ${item.withFamily ? '<span style="font-weight: normal; font-size: 0.72rem; color: var(--color-gold-champagne);">with Family</span>' : ''}</div>
             <div class="sent-rel-phone"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> +${item.phone} &bull; <span class="sent-rel-time">${item.date || ''}</span></div>
           </div>
           <button type="button" class="sent-rel-resend" data-name="${item.name}" data-phone="${item.phone}" data-family="${item.withFamily}">
