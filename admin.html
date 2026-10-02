@@ -1339,22 +1339,6 @@
           <i class="fa-solid fa-people-roof" style="color: var(--color-gold-bright); font-size: 1.2rem;"></i>
         </div>
 
-        <!-- Generated Link Preview -->
-        <div class="link-preview-box">
-          <div class="link-preview-title">
-            <span><i class="fa-solid fa-link"></i> Generated Guest Link (Locked)</span>
-          </div>
-          <div class="link-url-display" id="displayInviteUrl">...</div>
-          <div class="link-actions">
-            <button type="button" class="btn-action-small btn-copy-link" id="btnCopyGeneratedLink">
-              <i class="fa-regular fa-copy"></i> Copy Link
-            </button>
-            <a href="#" target="_blank" class="btn-action-small btn-test-preview" id="btnPreviewAsGuest">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Card
-            </a>
-          </div>
-        </div>
-
         <!-- WhatsApp Message Preview -->
         <div class="wa-preview-card">
           <div class="wa-preview-header">
@@ -1822,20 +1806,22 @@
       relativeNameInput.addEventListener('input', updatePreview);
       withFamilyCheckbox.addEventListener('change', updatePreview);
 
-      // Copy Link Button
-      btnCopyGeneratedLink.addEventListener('click', () => {
-        const { inviteUrl } = getInviteData();
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(inviteUrl).then(() => {
-            btnCopyGeneratedLink.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-            setTimeout(() => {
-              btnCopyGeneratedLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link';
-            }, 2000);
-          });
-        } else {
-          prompt('Copy link:', inviteUrl);
-        }
-      });
+      // Copy Link Button (if present)
+      if (btnCopyGeneratedLink) {
+        btnCopyGeneratedLink.addEventListener('click', () => {
+          const { inviteUrl } = getInviteData();
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(inviteUrl).then(() => {
+              btnCopyGeneratedLink.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+              setTimeout(() => {
+                btnCopyGeneratedLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link';
+              }, 2000);
+            });
+          } else {
+            prompt('Copy link:', inviteUrl);
+          }
+        });
+      }
 
       // ========================================================
       // Submit Form: Store in MySQL Database & Open WhatsApp
