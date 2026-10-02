@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Custom Styles (with Cache Buster) -->
-  <link rel="stylesheet" href="css/style.css?v=6.0">
+  <link rel="stylesheet" href="css/style.css?v=7.0">
 </head>
 <body>
 
@@ -362,9 +362,12 @@
         </div>
 
         <!-- Big Prominent TAP Button centered on card -->
-        <div class="card-tap-btn" id="cardTapBtn" onclick="openCard()" style="position: absolute; bottom: 42px; left: 0; right: 0; margin: 0 auto; width: fit-content; max-width: 85%; transform: translateZ(45px); z-index: 60; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px 34px; background: linear-gradient(135deg, #c59b27 0%, #fffadb 45%, #ffd700 80%, #977014 100%); color: #031c15; border: 2px solid #ffffff; border-radius: 50px; font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 12px 35px rgba(0,0,0,0.85), 0 0 25px rgba(255,215,0,0.7); white-space: nowrap; user-select: none;">
-          <i class="fa-solid fa-hand-pointer tap-icon" style="font-size: 1.35rem; color: #031c15;"></i>
-          <span>TAP TO OPEN</span>
+        <div class="card-tap-container" id="cardTapContainer">
+          <button type="button" class="card-tap-btn" id="cardTapBtn" aria-label="Tap to Open Invitation">
+            <span class="tap-icon"><i class="fa-solid fa-hand-pointer"></i></span>
+            <span class="tap-label">TAP TO OPEN</span>
+            <span class="tap-icon-spacer" aria-hidden="true"><i class="fa-solid fa-hand-pointer"></i></span>
+          </button>
         </div>
 
       </div>
@@ -571,6 +574,6 @@
   </div>
 
   <!-- Master Application Script (with Cache Buster) -->
-  <script src="js/app.js?v=6.0"></script>
+  <script src="js/app.js?v=7.0"></script>
 </body>
 </html>

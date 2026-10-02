@@ -283,8 +283,11 @@
     try {
       const ctx = getAudioContext();
       isAudioPlaying = true;
-      btnAudioToggle.classList.add('active');
-      btnAudioToggle.querySelector('.btn-text').textContent = 'Music On';
+      if (btnAudioToggle) {
+        btnAudioToggle.classList.add('active');
+        const txt = btnAudioToggle.querySelector('.btn-text');
+        if (txt) txt.textContent = 'Music On';
+      }
 
       // Raga Bhupali notes
       const scale = [293.66, 329.63, 369.99, 440.00, 493.88, 587.33, 739.99];
@@ -331,8 +334,11 @@
 
   function stopAmbientMelody() {
     isAudioPlaying = false;
-    btnAudioToggle.classList.remove('active');
-    btnAudioToggle.querySelector('.btn-text').textContent = 'Music';
+    if (btnAudioToggle) {
+      btnAudioToggle.classList.remove('active');
+      const txt = btnAudioToggle.querySelector('.btn-text');
+      if (txt) txt.textContent = 'Music';
+    }
     if (ambientMelodyInterval) {
       clearInterval(ambientMelodyInterval);
       ambientMelodyInterval = null;
@@ -348,34 +354,49 @@
   }
 
   // =========================================================================
-  // 3D Card Folding Interaction (Explicit Open / Close)
+  // 3D Card Folding Interaction (Explicit Open / Close with Debounce)
   // =========================================================================
-  function openCard() {
+  let lastCardActionTime = 0;
+
+  function openCard(e) {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     if (isOpen) return;
     isOpen = true;
+    lastCardActionTime = Date.now();
     weddingCard.classList.add('is-open');
 
     try {
       playUnfoldSound();
-    } catch (e) {
-      console.warn('Audio effect error:', e);
+    } catch (err) {
+      console.warn('Audio effect error:', err);
     }
 
-    if (!isAudioPlaying && !sessionStorage.getItem('audioPrompted')) {
-      sessionStorage.setItem('audioPrompted', 'true');
-      startAmbientMelody();
+    try {
+      if (!isAudioPlaying && !sessionStorage.getItem('audioPrompted')) {
+        sessionStorage.setItem('audioPrompted', 'true');
+        startAmbientMelody();
+      }
+    } catch (err) {
+      console.warn('Audio melody error:', err);
     }
   }
 
-  function closeCard() {
-    if (!isOpen) return;
+  function closeCard(e) {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
+    // Prevent immediate re-closing within 1200ms of opening
+    if (!isOpen || (Date.now() - lastCardActionTime < 1200)) return;
     isOpen = false;
+    lastCardActionTime = Date.now();
     weddingCard.classList.remove('is-open');
 
     try {
       playUnfoldSound();
-    } catch (e) {
-      console.warn('Audio effect error:', e);
+    } catch (err) {
+      console.warn('Audio effect error:', err);
     }
   }
 
@@ -384,9 +405,9 @@
       e.stopPropagation();
     }
     if (isOpen) {
-      closeCard();
+      closeCard(e);
     } else {
-      openCard();
+      openCard(e);
     }
   }
 
@@ -703,55 +724,73 @@
     if (guestGateForm) guestGateForm.addEventListener('submit', handleGateSubmit);
     if (btnEditGuestName) btnEditGuestName.addEventListener('click', reopenGuestGate);
 
-    // Wax Seal, Big TAP button & Fold Toggle
+    // =========================================================================
+    // Tap to Open Triggers (Robust Touch & Click Handling)
+    // =========================================================================
     const cardTapBtn = document.getElementById('cardTapBtn');
-    if (cardTapBtn) {
-      cardTapBtn.onclick = function (e) {
-        e.stopPropagation();
-        openCard();
-      };
-    }
-
-    if (waxSeal) {
-      waxSeal.onclick = function (e) {
-        e.stopPropagation();
-        openCard();
-      };
-    }
-
-    if (waxSealWrapper) {
-      waxSealWrapper.onclick = function (e) {
-        e.stopPropagation();
-        openCard();
-      };
-    }
-
-    // Tapping on closed flaps also opens card
+    const cardTapContainer = document.getElementById('cardTapContainer');
     const flapLeft = document.getElementById('flapLeft');
     const flapRight = document.getElementById('flapRight');
+
+    const handleOpenTrigger = (e) => {
+      if (e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.cancelable && e.type === 'touchend') {
+          e.preventDefault();
+        }
+      }
+      if (!isOpen) {
+        openCard(e);
+      }
+    };
+
+    // Card Tap Button & Container
+    if (cardTapBtn) {
+      cardTapBtn.addEventListener('click', handleOpenTrigger);
+      cardTapBtn.addEventListener('touchend', handleOpenTrigger);
+    }
+    if (cardTapContainer) {
+      cardTapContainer.addEventListener('click', handleOpenTrigger);
+      cardTapContainer.addEventListener('touchend', handleOpenTrigger);
+    }
+
+    // Wax Seal & Wrapper
+    if (waxSeal) {
+      waxSeal.addEventListener('click', handleOpenTrigger);
+      waxSeal.addEventListener('touchend', handleOpenTrigger);
+    }
+    if (waxSealWrapper) {
+      waxSealWrapper.addEventListener('click', handleOpenTrigger);
+      waxSealWrapper.addEventListener('touchend', handleOpenTrigger);
+    }
+
+    // Closed Gate Flaps
     if (flapLeft) {
       flapLeft.addEventListener('click', (e) => {
-        if (!isOpen) {
-          e.stopPropagation();
-          openCard();
-        }
+        if (!isOpen) handleOpenTrigger(e);
+      });
+      flapLeft.addEventListener('touchend', (e) => {
+        if (!isOpen) handleOpenTrigger(e);
       });
     }
     if (flapRight) {
       flapRight.addEventListener('click', (e) => {
-        if (!isOpen) {
-          e.stopPropagation();
-          openCard();
-        }
+        if (!isOpen) handleOpenTrigger(e);
+      });
+      flapRight.addEventListener('touchend', (e) => {
+        if (!isOpen) handleOpenTrigger(e);
       });
     }
 
-    // Clicking anywhere on card when open folds it back (except links)
+    // Card Body: When closed, any tap opens. When open, only closes if deliberate tap on background
     if (weddingCard) {
       weddingCard.addEventListener('click', (e) => {
-        if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
-        if (isOpen) {
-          closeCard();
+        if (!isOpen) {
+          handleOpenTrigger(e);
+        } else {
+          // If already open, do NOT close when tapping links, buttons, or inputs
+          if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
+          closeCard(e);
         }
       });
     }

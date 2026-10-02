@@ -1023,22 +1023,34 @@ body {
   pointer-events: auto;
 }
 
-/* Big Royal TAP Button perfectly centered horizontally on the card */
-.card-tap-btn {
+/* Container that guarantees 100% horizontal centering across the card */
+.card-tap-container {
   position: absolute;
   bottom: 42px;
   left: 0;
-  right: 0;
-  margin: 0 auto;
-  width: fit-content;
-  max-width: 85%;
-  transform: translateZ(45px);
-  z-index: 60;
+  width: 100%;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 60;
+  transform: translateZ(48px);
+  pointer-events: auto;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+}
+
+.wedding-card-3d.is-open .card-tap-container {
+  transform: translateZ(-30px) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Big Royal TAP Button with Symmetrical Icon and Hidden Spacer for 100% Dead Center Alignment */
+.card-tap-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 14px 34px;
+  padding: 14px 32px;
   background: linear-gradient(135deg, #c59b27 0%, #fffadb 45%, #ffd700 80%, #977014 100%);
   color: #031c15;
   border: 2px solid #ffffff;
@@ -1046,7 +1058,7 @@ body {
   font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 800;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 
@@ -1054,22 +1066,37 @@ body {
     0 0 25px rgba(255, 215, 0, 0.7),
     inset 0 1px 3px rgba(255, 255, 255, 0.9);
   animation: tapButtonGlow 2.2s infinite ease-in-out;
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
   user-select: none;
   -webkit-user-select: none;
   white-space: nowrap;
-}
-
-.wedding-card-3d.is-open .card-tap-btn {
-  transform: translateZ(-30px) scale(0);
-  opacity: 0;
-  pointer-events: none;
+  outline: none;
+  text-align: center;
+  touch-action: manipulation;
 }
 
 .card-tap-btn .tap-icon {
   font-size: 1.35rem;
   color: #031c15;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
   animation: tapHandBounce 1.5s infinite ease-in-out;
+}
+
+.card-tap-btn .tap-label {
+  display: inline-block;
+  text-align: center;
+}
+
+/* Symmetrical spacer matches tap-icon width so TAP TO OPEN is mathematically dead-centered */
+.card-tap-btn .tap-icon-spacer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @keyframes tapButtonGlow {
@@ -1098,14 +1125,19 @@ body {
 }
 
 @media (max-width: 600px) {
+  .card-tap-container {
+    bottom: 34px;
+  }
   .card-tap-btn {
-    padding: 12px 28px;
+    padding: 12px 24px;
     font-size: 1.05rem;
     letter-spacing: 1.5px;
-    bottom: 35px;
+    gap: 8px;
   }
-  .card-tap-btn .tap-icon {
+  .card-tap-btn .tap-icon,
+  .card-tap-btn .tap-icon-spacer {
     font-size: 1.15rem;
+    width: 20px;
   }
 }
 
