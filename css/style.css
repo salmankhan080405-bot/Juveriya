@@ -1026,7 +1026,7 @@ body {
 /* Container that guarantees 100% horizontal centering across the card */
 .card-tap-container {
   position: absolute;
-  bottom: 42px;
+  bottom: 84px;
   left: 0;
   width: 100%;
   display: flex;
@@ -1126,7 +1126,7 @@ body {
 
 @media (max-width: 600px) {
   .card-tap-container {
-    bottom: 34px;
+    bottom: 74px;
   }
   .card-tap-btn {
     padding: 12px 24px;

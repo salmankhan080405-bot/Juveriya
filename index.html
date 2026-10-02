@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=1024, user-scalable=yes">
   <title>Wedding Invitation | Juveriya & Abdul Hadi</title>
+  
+  <!-- Force Desktop Site Viewport on Mobile Devices -->
+  <script>
+    (function () {
+      if (window.screen && (window.screen.width < 1024 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+        var meta = document.querySelector('meta[name="viewport"]');
+        if (meta) {
+          meta.setAttribute('content', 'width=1024, user-scalable=yes');
+        }
+      }
+    })();
+  </script>
   
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💍</text></svg>">
@@ -17,7 +29,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Custom Styles (with Cache Buster) -->
-  <link rel="stylesheet" href="css/style.css?v=7.0">
+  <link rel="stylesheet" href="css/style.css?v=8.0">
 </head>
 <body>
 
@@ -84,10 +96,10 @@
   <!-- Ambient Audio Player Element -->
   <audio id="weddingAudio" loop preload="auto"></audio>
 
-  <!-- Navigation / Luxury Header Monogram -->
+  <!-- Navigation / Luxury Header Monogram (H & J: Hadi & Juveriya) -->
   <header class="top-nav">
     <div class="brand-monogram">
-      <span class="monogram-letter">A</span>
+      <span class="monogram-letter">H</span>
       <span class="monogram-amp">&amp;</span>
       <span class="monogram-letter">J</span>
     </div>
@@ -354,7 +366,7 @@
           <div class="wax-seal" id="waxSeal" onclick="openCard()">
             <div class="seal-inner-emboss">
               <span class="seal-arabic">بِسْمِ اللهِ</span>
-              <span class="seal-initials">A &amp; J</span>
+              <span class="seal-initials">H &amp; J</span>
               <span class="seal-subtext">2025</span>
             </div>
             <div class="seal-glow-ring"></div>
@@ -574,6 +586,6 @@
   </div>
 
   <!-- Master Application Script (with Cache Buster) -->
-  <script src="js/app.js?v=7.0"></script>
+  <script src="js/app.js?v=8.0"></script>
 </body>
 </html>
