@@ -867,7 +867,18 @@
       font-size: 2rem;
       margin-bottom: 10px;
       display: block;
-      color: rgba(223, 183, 108, 0.35);
+    .db-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.4);
+      color: #85f2ad;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
@@ -937,23 +948,6 @@
           <i class="fa-solid fa-people-roof" style="color: var(--color-gold-bright); font-size: 1.2rem;"></i>
         </div>
 
-        <!-- Mobile Number -->
-        <div class="form-group">
-          <label class="form-label" for="mobileNumberInput">
-            <i class="fa-solid fa-mobile-screen-button"></i>
-            <span>Relative's WhatsApp Mobile Number</span>
-          </label>
-          <input 
-            type="tel" 
-            id="mobileNumberInput" 
-            class="form-input" 
-            placeholder="e.g. 9849012345 (10 digits)" 
-            required
-            autocomplete="tel"
-          >
-          <div class="input-hint">Indian 10-digit mobile numbers are automatically formatted with country code (+91).</div>
-        </div>
-
         <!-- Generated Link Preview -->
         <div class="link-preview-box">
           <div class="link-preview-title">
@@ -1008,7 +1002,12 @@
           <i class="fa-solid fa-clock-rotate-left"></i>
           <span>Invitation History (<span id="modalHistoryCount">0</span>)</span>
         </div>
-        <button type="button" class="btn-history-close" id="btnCloseHistory" aria-label="Close History">&times;</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="db-status-badge" id="dbStatusBadge">
+            <i class="fa-solid fa-database"></i> <span>MySQL</span>
+          </span>
+          <button type="button" class="btn-history-close" id="btnCloseHistory" aria-label="Close History">&times;</button>
+        </div>
       </div>
 
       <!-- Total Invitations Count Summary Bar -->
@@ -1033,7 +1032,7 @@
       <!-- Search Bar -->
       <div class="history-search-bar">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="historySearchInput" placeholder="Search relatives by name or phone...">
+        <input type="text" id="historySearchInput" placeholder="Search relatives by name...">
       </div>
 
       <!-- Relatives List -->
@@ -1065,11 +1064,10 @@
       'use strict';
 
       const STORAGE_KEY = 'juveriya_wedding_card_data';
-      const WA_SENT_STORAGE_KEY = 'juveriya_sent_relatives_list';
-      const DB_NAME = 'JuveriyaWeddingDB';
-      const DB_VERSION = 1;
-      const STORE_NAME = 'invitations';
-      const DB_BACKUP_KEY = 'juveriya_sent_relatives_database';
+      const LOCAL_BACKUP_KEY = 'juveriya_wedding_invitations_backup';
+      const API_BASE = (window.location.origin && window.location.origin.startsWith('http')) 
+        ? window.location.origin 
+        : 'http://localhost:3000';
 
       const DEFAULT_DATA = {
         groomName: 'Abdul Hadi',
@@ -1107,127 +1105,114 @@
       }
 
       // ========================================================
-      // Robust IndexedDB Database Implementation + LocalStorage Sync
+      // MySQL Database Client (with automatic fallback to local sync)
       // ========================================================
-      class InvitationDatabase {
+      class MySQLDatabaseClient {
         constructor() {
-          this.db = null;
-          this.readyPromise = this.init();
+          this.isMySQL = false;
         }
 
-        async init() {
-          return new Promise((resolve) => {
-            if (!window.indexedDB) {
-              console.warn('IndexedDB not supported, falling back to localStorage');
-              resolve(null);
-              return;
-            }
-            try {
-              const request = indexedDB.open(DB_NAME, DB_VERSION);
-              request.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                  const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                  store.createIndex('phone', 'phone', { unique: false });
-                  store.createIndex('timestamp', 'timestamp', { unique: false });
-                }
-              };
-              request.onsuccess = (e) => {
-                this.db = e.target.result;
-                this.migrateFromLocalStorage().then(() => resolve(this.db));
-              };
-              request.onerror = () => {
-                resolve(null);
-              };
-            } catch (err) {
-              resolve(null);
-            }
-          });
-        }
-
-        async migrateFromLocalStorage() {
+        async checkStatus() {
           try {
-            const oldRaw = localStorage.getItem(WA_SENT_STORAGE_KEY) || localStorage.getItem(DB_BACKUP_KEY);
-            if (oldRaw) {
-              const list = JSON.parse(oldRaw);
-              if (Array.isArray(list) && list.length > 0) {
-                const currentCount = await this.count();
-                if (currentCount === 0) {
-                  for (const item of list) {
-                    await this.save(item, false);
-                  }
-                }
-              }
+            const res = await fetch(`${API_BASE}/api/status`, { signal: AbortSignal.timeout(2000) });
+            if (res.ok) {
+              const data = await res.json();
+              this.isMySQL = !!data.connected;
+              this.updateStatusBadge(this.isMySQL);
+              return this.isMySQL;
             }
           } catch (e) {
-            console.warn('Migration error:', e);
+            this.isMySQL = false;
+            this.updateStatusBadge(false);
+          }
+          return false;
+        }
+
+        updateStatusBadge(connected) {
+          const badge = document.getElementById('dbStatusBadge');
+          if (!badge) return;
+          if (connected) {
+            badge.style.background = 'rgba(37, 211, 102, 0.18)';
+            badge.style.borderColor = 'rgba(37, 211, 102, 0.5)';
+            badge.style.color = '#85f2ad';
+            badge.innerHTML = '<i class="fa-solid fa-database"></i> <span>MySQL Connected</span>';
+          } else {
+            badge.style.background = 'rgba(255, 193, 7, 0.15)';
+            badge.style.borderColor = 'rgba(255, 193, 7, 0.4)';
+            badge.style.color = '#ffd54f';
+            badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> <span>Local DB Synced</span>';
           }
         }
 
-        async save(item, updateLocalStorage = true) {
-          await this.readyPromise;
-          const record = {
-            name: item.name || '',
-            phone: item.phone || '',
-            withFamily: !!item.withFamily,
-            greeting: item.greeting || (item.withFamily ? `${item.name} with Family` : item.name),
-            inviteUrl: item.inviteUrl || '',
-            message: item.message || '',
-            timestamp: item.timestamp || Date.now(),
-            date: item.date || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-            time: item.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-
-          if (this.db) {
-            await new Promise((resolve) => {
-              try {
-                const tx = this.db.transaction(STORE_NAME, 'readwrite');
-                const store = tx.objectStore(STORE_NAME);
-                const index = store.index('phone');
-                const getReq = index.getAll(record.phone);
-                getReq.onsuccess = () => {
-                  const matches = getReq.result;
-                  if (matches && matches.length > 0) {
-                    record.id = matches[0].id;
-                    store.put(record);
-                  } else {
-                    store.add(record);
-                  }
-                };
-                tx.oncomplete = () => resolve(true);
-                tx.onerror = () => resolve(false);
-              } catch (e) {
-                resolve(false);
-              }
+        async save(record) {
+          // Attempt MySQL save first
+          try {
+            const res = await fetch(`${API_BASE}/api/invitations`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(record),
+              signal: AbortSignal.timeout(3000)
             });
+            if (res.ok) {
+              const result = await res.json();
+              this.isMySQL = true;
+              this.updateStatusBadge(true);
+              this.saveLocalBackup(result.data || record);
+              return { success: true, source: 'mysql', data: result.data };
+            }
+          } catch (e) {
+            this.isMySQL = false;
+            this.updateStatusBadge(false);
           }
 
-          if (updateLocalStorage) {
-            await this.syncToLocalStorage();
-          }
-          return record;
+          // Fallback to local storage
+          const localItem = Object.assign({
+            id: Date.now(),
+            created_at: new Date().toISOString()
+          }, record);
+          this.saveLocalBackup(localItem);
+          return { success: true, source: 'local', data: localItem };
         }
 
         async getAll() {
-          await this.readyPromise;
-          if (this.db) {
-            return new Promise((resolve) => {
-              try {
-                const tx = this.db.transaction(STORE_NAME, 'readonly');
-                const store = tx.objectStore(STORE_NAME);
-                const req = store.getAll();
-                req.onsuccess = () => {
-                  const list = req.result || [];
-                  list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                  resolve(list);
-                };
-                req.onerror = () => resolve(this.getFromLocalStorage());
-              } catch (e) {
-                resolve(this.getFromLocalStorage());
+          try {
+            const res = await fetch(`${API_BASE}/api/invitations`, { signal: AbortSignal.timeout(2500) });
+            if (res.ok) {
+              const result = await res.json();
+              this.isMySQL = true;
+              this.updateStatusBadge(true);
+              if (Array.isArray(result.data)) {
+                localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(result.data));
+                return this.formatRows(result.data);
               }
-            });
+            }
+          } catch (e) {
+            this.isMySQL = false;
+            this.updateStatusBadge(false);
           }
-          return this.getFromLocalStorage();
+
+          // Fallback to local storage backup
+          const list = this.getLocalBackup();
+          return this.formatRows(list);
+        }
+
+        formatRows(rows) {
+          return rows.map(r => {
+            const dateObj = r.created_at ? new Date(r.created_at) : new Date();
+            const date = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return {
+              id: r.id,
+              name: r.name,
+              withFamily: Boolean(r.with_family !== undefined ? r.with_family : r.withFamily),
+              greeting: r.greeting || (r.with_family ? `${r.name} with Family` : r.name),
+              inviteUrl: r.invite_url || r.inviteUrl,
+              message: r.message,
+              date,
+              time,
+              timestamp: isNaN(dateObj.getTime()) ? Date.now() : dateObj.getTime()
+            };
+          });
         }
 
         async count() {
@@ -1236,64 +1221,39 @@
         }
 
         async delete(id) {
-          await this.readyPromise;
-          if (this.db && id) {
-            await new Promise((resolve) => {
-              try {
-                const tx = this.db.transaction(STORE_NAME, 'readwrite');
-                const store = tx.objectStore(STORE_NAME);
-                store.delete(Number(id));
-                tx.oncomplete = () => resolve(true);
-                tx.onerror = () => resolve(false);
-              } catch (e) {
-                resolve(false);
-              }
-            });
-          }
-          const list = this.getFromLocalStorage().filter(x => x.id !== id);
-          localStorage.setItem(DB_BACKUP_KEY, JSON.stringify(list));
-          localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(list));
-          await this.syncToLocalStorage();
+          try {
+            await fetch(`${API_BASE}/api/invitations/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(2500) });
+          } catch (e) {}
+
+          const list = this.getLocalBackup().filter(x => x.id !== Number(id) && x.id !== id);
+          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(list));
         }
 
         async clear() {
-          await this.readyPromise;
-          if (this.db) {
-            await new Promise((resolve) => {
-              try {
-                const tx = this.db.transaction(STORE_NAME, 'readwrite');
-                const store = tx.objectStore(STORE_NAME);
-                store.clear();
-                tx.oncomplete = () => resolve(true);
-                tx.onerror = () => resolve(false);
-              } catch (e) {
-                resolve(false);
-              }
-            });
-          }
-          localStorage.removeItem(DB_BACKUP_KEY);
-          localStorage.removeItem(WA_SENT_STORAGE_KEY);
+          try {
+            await fetch(`${API_BASE}/api/invitations`, { method: 'DELETE', signal: AbortSignal.timeout(2500) });
+          } catch (e) {}
+          localStorage.removeItem(LOCAL_BACKUP_KEY);
         }
 
-        getFromLocalStorage() {
+        getLocalBackup() {
           try {
-            const raw = localStorage.getItem(DB_BACKUP_KEY) || localStorage.getItem(WA_SENT_STORAGE_KEY);
+            const raw = localStorage.getItem(LOCAL_BACKUP_KEY) || localStorage.getItem('juveriya_sent_relatives_list');
             return raw ? JSON.parse(raw) : [];
           } catch (e) {
             return [];
           }
         }
 
-        async syncToLocalStorage() {
-          try {
-            const list = await this.getAll();
-            localStorage.setItem(DB_BACKUP_KEY, JSON.stringify(list));
-            localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(list));
-          } catch (e) {}
+        saveLocalBackup(item) {
+          const list = this.getLocalBackup();
+          const filtered = list.filter(x => (x.name || '').toLowerCase() !== (item.name || '').toLowerCase());
+          filtered.unshift(item);
+          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(filtered.slice(0, 100)));
         }
       }
 
-      const db = new InvitationDatabase();
+      const db = new MySQLDatabaseClient();
 
       // ========================================================
       // DOM Elements
@@ -1301,7 +1261,6 @@
       const relativeNameInput = document.getElementById('relativeNameInput');
       const withFamilyCheckbox = document.getElementById('withFamilyCheckbox');
       const familyToggleBox = document.getElementById('familyToggleBox');
-      const mobileNumberInput = document.getElementById('mobileNumberInput');
       const displayInviteUrl = document.getElementById('displayInviteUrl');
       const btnCopyGeneratedLink = document.getElementById('btnCopyGeneratedLink');
       const btnPreviewAsGuest = document.getElementById('btnPreviewAsGuest');
@@ -1357,7 +1316,6 @@
         const withFamily = withFamilyCheckbox.checked;
         const greeting = withFamily ? `${cleanName} with Family` : cleanName;
 
-        // Base URL for guest invitation (always points to index.html)
         let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
         const isLocal = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
@@ -1404,12 +1362,11 @@
       });
 
       // ========================================================
-      // Submit Form: Store in Database & Open WhatsApp Direct Chat
+      // Submit Form: Store in MySQL Database & Open WhatsApp
       // ========================================================
       adminInviteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const relativeName = relativeNameInput.value.trim();
-        let rawPhone = mobileNumberInput.value.trim().replace(/\D/g, '');
 
         if (!relativeName) {
           alert("Please enter the relative's name.");
@@ -1417,40 +1374,27 @@
           return;
         }
 
-        if (rawPhone.length === 10) {
-          rawPhone = '91' + rawPhone;
-        }
-
-        if (!rawPhone || rawPhone.length < 10) {
-          alert('Please enter a valid 10-digit mobile number.');
-          mobileNumberInput.focus();
-          return;
-        }
-
         const withFamily = withFamilyCheckbox.checked;
         const { message, inviteUrl, greeting } = getInviteData();
 
-        // 1. Store in IndexedDB Database
-        await db.save({
+        // 1. Store in MySQL Database
+        const saveRes = await db.save({
           name: relativeName,
-          phone: rawPhone,
           withFamily: withFamily,
           greeting: greeting,
           inviteUrl: inviteUrl,
-          message: message,
-          timestamp: Date.now(),
-          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          message: message
         });
 
         // 2. Update real-time counts across UI
         await updateCounters();
 
         // 3. Show Database confirmation toast
-        showToast(`Saved ${greeting} in Database! Opening WhatsApp...`);
+        const sourceText = (saveRes && saveRes.source === 'mysql') ? 'MySQL Database' : 'Database';
+        showToast(`Saved ${greeting} in ${sourceText}! Opening WhatsApp...`);
 
-        // 4. Launch WhatsApp Direct Chat
-        const waUrl = `https://api.whatsapp.com/send?phone=${rawPhone}&text=${encodeURIComponent(message)}`;
+        // 4. Launch WhatsApp (opens contact picker)
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         window.open(waUrl, '_blank');
       });
 
@@ -1483,15 +1427,14 @@
         if (filterText) {
           const q = filterText.toLowerCase();
           filtered = relatives.filter(r => 
-            (r.name && r.name.toLowerCase().includes(q)) || 
-            (r.phone && r.phone.includes(q))
+            (r.name && r.name.toLowerCase().includes(q))
           );
         }
 
         if (filtered.length === 0) {
           historyRelativesList.innerHTML = filterText 
             ? '<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i>No relatives found matching "' + escapeHtml(filterText) + '"</div>'
-            : '<div class="empty-state"><i class="fa-solid fa-address-book"></i>No invitations stored in database yet.<br>Enter a name & mobile number above to send!</div>';
+            : '<div class="empty-state"><i class="fa-solid fa-address-book"></i>No invitations stored in database yet.<br>Enter a relative name above to send!</div>';
           return;
         }
 
@@ -1503,16 +1446,13 @@
                 <span>${escapeHtml(item.name)}</span>
                 ${item.withFamily ? '<span class="family-tag-badge"><i class="fa-solid fa-people-roof"></i> with Family</span>' : ''}
               </div>
-              <div class="history-rel-phone">
-                <i class="fa-brands fa-whatsapp" style="color: var(--color-whatsapp);"></i> +${escapeHtml(item.phone)}
+              <div class="history-rel-time">
+                <i class="fa-regular fa-clock"></i> ${escapeHtml(item.date || '')} &bull; ${escapeHtml(item.time || '')}
               </div>
             </div>
-            <div class="history-rel-details">
-              <span class="history-rel-time"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.date || '')} &bull; ${escapeHtml(item.time || '')}</span>
-            </div>
             <div class="history-rel-actions">
-              <button type="button" class="btn-rel-action btn-rel-resend" data-name="${escapeHtml(item.name)}" data-phone="${escapeHtml(item.phone)}" data-family="${item.withFamily}">
-                <i class="fa-brands fa-whatsapp"></i> Resend
+              <button type="button" class="btn-rel-action btn-rel-resend" data-name="${escapeHtml(item.name)}" data-family="${item.withFamily}">
+                <i class="fa-brands fa-whatsapp"></i> Resend via WhatsApp
               </button>
               <button type="button" class="btn-rel-action btn-rel-copy" data-url="${escapeHtml(item.inviteUrl)}">
                 <i class="fa-regular fa-copy"></i> Copy Link
@@ -1530,10 +1470,7 @@
         // Wire Resend
         historyRelativesList.querySelectorAll('.btn-rel-resend').forEach(btn => {
           btn.addEventListener('click', () => {
-            const rawPhone = btn.getAttribute('data-phone') || '';
-            const phoneDisplay = rawPhone.startsWith('91') && rawPhone.length === 12 ? rawPhone.slice(2) : rawPhone;
             relativeNameInput.value = btn.getAttribute('data-name');
-            mobileNumberInput.value = phoneDisplay;
             withFamilyCheckbox.checked = btn.getAttribute('data-family') === 'true';
             updatePreview();
             closeHistoryModal();
@@ -1562,8 +1499,8 @@
           btn.addEventListener('click', async () => {
             const name = btn.getAttribute('data-name');
             const id = btn.getAttribute('data-id');
-            if (confirm(`Delete invitation record for "${name}" from database?`)) {
-              await db.delete(Number(id));
+            if (confirm(`Delete invitation record for "${name}" from MySQL database?`)) {
+              await db.delete(id);
               await renderHistoryList(historySearchInput ? historySearchInput.value.trim() : '');
               showToast(`Deleted ${name} from database.`);
             }
@@ -1575,6 +1512,7 @@
       function openHistoryModal() {
         if (!historyModal) return;
         if (historySearchInput) historySearchInput.value = '';
+        db.checkStatus();
         renderHistoryList('');
         historyModal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -1621,11 +1559,10 @@
             alert('No invitations in the database to export.');
             return;
           }
-          const headers = ['Relative Name', 'With Family', 'Mobile Number', 'Date Sent', 'Time Sent', 'Invitation Link'];
+          const headers = ['Relative Name', 'With Family', 'Date Sent', 'Time Sent', 'Invitation Link'];
           const rows = list.map(r => [
             `"${(r.name || '').replace(/"/g, '""')}"`,
             r.withFamily ? '"Yes"' : '"No"',
-            `"+${r.phone || ''}"`,
             `"${r.date || ''}"`,
             `"${r.time || ''}"`,
             `"${(r.inviteUrl || '').replace(/"/g, '""')}"`
@@ -1634,7 +1571,7 @@
           const encodedUri = encodeURI(csvContent);
           const link = document.createElement('a');
           link.setAttribute('href', encodedUri);
-          link.setAttribute('download', `Juveriya_Wedding_Invitations_${new Date().toISOString().slice(0, 10)}.csv`);
+          link.setAttribute('download', `Juveriya_Wedding_Invitations_MySQL_${new Date().toISOString().slice(0, 10)}.csv`);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1644,10 +1581,10 @@
       // Clear All History
       if (btnClearHistoryDb) {
         btnClearHistoryDb.addEventListener('click', async () => {
-          if (confirm('Are you sure you want to clear all invitations from the database? This cannot be undone.')) {
+          if (confirm('Are you sure you want to clear all invitations from MySQL database? This cannot be undone.')) {
             await db.clear();
             await renderHistoryList('');
-            showToast('All invitation history cleared.');
+            showToast('All invitation history cleared from MySQL.');
           }
         });
       }
@@ -1655,6 +1592,7 @@
       // Initial setup
       updatePreview();
       updateCounters();
+      db.checkStatus();
 
     })();
   </script>

@@ -951,24 +951,12 @@
       }
     });
 
-    // Form Submit: Clean number and open WhatsApp direct chat
+    // Form Submit: Open WhatsApp and save
     waSenderForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const relativeName = inputWaRelativeName.value.trim();
-      let rawPhone = inputWaMobileNumber.value.trim().replace(/\D/g, '');
 
       if (!relativeName) return;
-
-      // Format Indian mobile numbers automatically:
-      // If 10 digits e.g. 9849012345, prepend 91
-      if (rawPhone.length === 10) {
-        rawPhone = '91' + rawPhone;
-      }
-
-      if (!rawPhone) {
-        alert('Please enter a valid mobile number.');
-        return;
-      }
 
       const withFamily = checkWaWithFamily.checked;
       const { greeting, message, inviteUrl } = buildPersonalizedInvite(relativeName, withFamily);
@@ -976,7 +964,6 @@
       // Save to Sent Tracker
       saveSentRelative({
         name: relativeName,
-        phone: rawPhone,
         withFamily: withFamily,
         inviteUrl: inviteUrl,
         date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -984,8 +971,8 @@
 
       renderSentRelatives();
 
-      // Launch WhatsApp Direct Chat
-      const waUrl = `https://api.whatsapp.com/send?phone=${rawPhone}&text=${encodeURIComponent(message)}`;
+      // Launch WhatsApp (opens contact picker)
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
       window.open(waUrl, '_blank');
     });
 
@@ -1001,10 +988,10 @@
 
     function saveSentRelative(item) {
       const list = getSentRelatives();
-      // Remove previous duplicate if present
-      const filtered = list.filter(x => x.phone !== item.phone);
+      // Remove previous duplicate by name if present
+      const filtered = list.filter(x => (x.name || '').toLowerCase() !== (item.name || '').toLowerCase());
       filtered.unshift(item); // Add to beginning
-      localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(filtered.slice(0, 30)));
+      localStorage.setItem(WA_SENT_STORAGE_KEY, JSON.stringify(filtered.slice(0, 50)));
     }
 
     function renderSentRelatives() {
@@ -1016,7 +1003,7 @@
       countEl.textContent = list.length;
 
       if (list.length === 0) {
-        container.innerHTML = '<div style="color: rgba(223,183,108,0.5); font-size: 0.75rem; text-align: center; padding: 10px;">No invitations sent yet. Enter a name and number above!</div>';
+        container.innerHTML = '<div style="color: rgba(223,183,108,0.5); font-size: 0.75rem; text-align: center; padding: 10px;">No invitations sent yet. Enter a relative name above!</div>';
         return;
       }
 
@@ -1024,9 +1011,9 @@
         <div class="sent-relative-item">
           <div>
             <div class="sent-rel-name">${item.name} ${item.withFamily ? '<span style="font-weight: normal; font-size: 0.72rem; color: var(--color-gold-champagne);">with Family</span>' : ''}</div>
-            <div class="sent-rel-phone"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> +${item.phone} &bull; <span class="sent-rel-time">${item.date || ''}</span></div>
+            <div class="sent-rel-phone"><i class="fa-regular fa-clock"></i> <span class="sent-rel-time">${item.date || ''}</span></div>
           </div>
-          <button type="button" class="sent-rel-resend" data-name="${item.name}" data-phone="${item.phone}" data-family="${item.withFamily}">
+          <button type="button" class="sent-rel-resend" data-name="${item.name}" data-family="${item.withFamily}">
             Resend
           </button>
         </div>
@@ -1036,7 +1023,6 @@
       container.querySelectorAll('.sent-rel-resend').forEach(btn => {
         btn.addEventListener('click', () => {
           inputWaRelativeName.value = btn.getAttribute('data-name');
-          inputWaMobileNumber.value = btn.getAttribute('data-phone');
           checkWaWithFamily.checked = btn.getAttribute('data-family') === 'true';
           updateWaMessagePreview();
           waSenderForm.dispatchEvent(new Event('submit'));

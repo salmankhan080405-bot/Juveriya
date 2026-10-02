@@ -4,8 +4,8 @@
   "description": "Royal Islamic 3D Folding Wedding Invitation Card for Juveriya & Abdul Hadi",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve . -p 3000",
-    "dev": "npx serve . -p 3000",
+    "start": "node server.js",
+    "dev": "node server.js",
     "open": "open index.html"
   },
   "keywords": [
@@ -16,5 +16,10 @@
     "juveriya-abdul-hadi"
   ],
   "author": "Mohammed Salman",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.5"
+  }
 }
