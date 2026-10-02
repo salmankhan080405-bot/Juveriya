@@ -231,14 +231,13 @@ body {
 
 .gate-relative-family {
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-style: italic;
+  font-weight: 400;
   color: var(--color-gold-light);
-  background: rgba(223, 183, 108, 0.15);
-  border: 1px solid rgba(223, 183, 108, 0.4);
-  padding: 3px 14px;
-  border-radius: 16px;
-  display: inline-block;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-top: 4px;
 }
 
 .nav-btn-admin {
