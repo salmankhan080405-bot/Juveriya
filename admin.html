@@ -524,7 +524,7 @@
       </div>
       <h1 class="admin-main-heading">Juveriya &amp; Abdul Hadi</h1>
       <p class="admin-subheading">
-        Set your relative's name and choose whether to include <strong>&ldquo;with Family&rdquo;</strong>. Their link locks their name so guests cannot edit it!
+        Set your relative's name and choose whether to include <strong>&ldquo;&amp; FAMILY&rdquo;</strong>. Their link locks their name so guests cannot edit it!
       </p>
     </div>
 
@@ -555,8 +555,8 @@
           <div class="checkbox-left">
             <input type="checkbox" id="withFamilyCheckbox" checked>
             <div>
-              <div class="checkbox-title">Include &ldquo;with Family&rdquo;</div>
-              <div class="checkbox-sub">Card displays &ldquo;[Name] with Family&rdquo;</div>
+              <div class="checkbox-title">Include &ldquo;&amp; FAMILY&rdquo;</div>
+              <div class="checkbox-sub">Card displays &ldquo;[Name] &amp; FAMILY&rdquo;</div>
             </div>
           </div>
           <i class="fa-solid fa-people-roof" style="color: var(--color-gold-bright); font-size: 1.2rem;"></i>
@@ -691,7 +691,7 @@
         const rawName = relativeNameInput.value.trim();
         const cleanName = rawName || 'Saniya';
         const withFamily = withFamilyCheckbox.checked;
-        const greeting = withFamily ? `${cleanName} with Family` : cleanName;
+        const greeting = withFamily ? `${cleanName} & FAMILY` : cleanName;
 
         // Base URL for guest invitation (always points to index.html)
         let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
@@ -820,7 +820,7 @@
             <div class="sent-item-info">
               <div class="sent-item-name">
                 ${item.name} 
-                ${item.withFamily ? '<span class="sent-item-family-tag">with Family</span>' : ''}
+                ${item.withFamily ? '<span class="sent-item-family-tag">&amp; FAMILY</span>' : ''}
               </div>
               <div class="sent-item-phone">
                 <i class="fa-brands fa-whatsapp" style="color: var(--color-whatsapp);"></i> +${item.phone} &bull; ${item.date || ''}

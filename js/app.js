@@ -143,7 +143,7 @@
       if (gateFallbackView) gateFallbackView.style.display = 'none';
       if (gateGuestNameDisplay) gateGuestNameDisplay.textContent = initialName;
       if (gateGuestFamilyDisplay) {
-        gateGuestFamilyDisplay.textContent = 'with Family';
+        gateGuestFamilyDisplay.textContent = '& FAMILY';
         gateGuestFamilyDisplay.style.display = withFamily ? 'inline-block' : 'none';
       }
     } else {
@@ -169,20 +169,24 @@
 
   function setGuestInformation(name, withFamily) {
     const cleanName = name || 'Honored Guest';
-    const familyText = withFamily ? 'with Family' : '';
+    const familyText = withFamily ? '& FAMILY' : '';
 
     localStorage.setItem(GUEST_STORAGE_KEY, cleanName);
     localStorage.setItem(GUEST_FAMILY_KEY, withFamily ? 'true' : 'false');
 
-    // Update Banner
-    displayBannerGuestName.textContent = cleanName;
-    displayBannerFamilyTag.textContent = familyText;
-    displayBannerFamilyTag.style.display = withFamily ? 'inline-block' : 'none';
+    // Update Banner (if ribbon exists)
+    if (displayBannerGuestName) displayBannerGuestName.textContent = cleanName;
+    if (displayBannerFamilyTag) {
+      displayBannerFamilyTag.textContent = familyText;
+      displayBannerFamilyTag.style.display = withFamily ? 'inline-block' : 'none';
+    }
 
     // Update Inner Card
-    displayCardGuestName.textContent = cleanName;
-    displayCardFamilyTag.textContent = familyText;
-    displayCardFamilyTag.style.display = withFamily ? 'inline-block' : 'none';
+    if (displayCardGuestName) displayCardGuestName.textContent = cleanName;
+    if (displayCardFamilyTag) {
+      displayCardFamilyTag.textContent = familyText;
+      displayCardFamilyTag.style.display = withFamily ? 'inline-block' : 'none';
+    }
   }
 
   function handleGateSubmit(e) {
@@ -659,7 +663,7 @@
     const data = loadCardData();
     const guestName = localStorage.getItem(GUEST_STORAGE_KEY) || 'Honored Guest';
     const withFamily = localStorage.getItem(GUEST_FAMILY_KEY) !== 'false';
-    const guestLine = withFamily ? `${guestName} with Family` : guestName;
+    const guestLine = withFamily ? `${guestName} & FAMILY` : guestName;
 
     const shareText = 
       `✨ *Royal Wedding Invitation* ✨\n\n` +
@@ -897,7 +901,7 @@
     function buildPersonalizedInvite(relativeName, withFamily) {
       const data = loadCardData();
       const cleanName = relativeName.trim() || 'Relative Name';
-      const greeting = withFamily ? `${cleanName} with Family` : cleanName;
+      const greeting = withFamily ? `${cleanName} & FAMILY` : cleanName;
       
       // Determine invite URL (Always ensures a valid live web link for WhatsApp)
       let baseUrl = 'https://salmankhan080405-bot.github.io/Juveriya/';
@@ -1028,7 +1032,7 @@
       container.innerHTML = list.map(item => `
         <div class="sent-relative-item">
           <div>
-            <div class="sent-rel-name">${item.name} ${item.withFamily ? '<span style="font-weight: normal; font-size: 0.72rem; color: var(--color-gold-champagne);">with Family</span>' : ''}</div>
+            <div class="sent-rel-name">${item.name} ${item.withFamily ? '<span style="font-weight: normal; font-size: 0.72rem; color: var(--color-gold-champagne);">&amp; FAMILY</span>' : ''}</div>
             <div class="sent-rel-phone"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> +${item.phone} &bull; <span class="sent-rel-time">${item.date || ''}</span></div>
           </div>
           <button type="button" class="sent-rel-resend" data-name="${item.name}" data-phone="${item.phone}" data-family="${item.withFamily}">
