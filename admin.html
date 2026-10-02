@@ -1098,6 +1098,141 @@
       opacity: 1;
       color: var(--color-gold-bright);
     }
+
+    /* ======================================================== */
+    /* Mobile Responsive Optimizations (< 640px)                */
+    /* ======================================================== */
+    @media (max-width: 640px) {
+      body {
+        padding: 12px 10px 40px;
+      }
+
+      .admin-container {
+        gap: 14px;
+        max-width: 100%;
+      }
+
+      .admin-nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 18px;
+      }
+
+      .admin-nav-brand {
+        justify-content: center;
+        font-size: 0.95rem;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(223, 183, 108, 0.2);
+        width: 100%;
+        text-align: center;
+      }
+
+      .admin-nav-actions {
+        display: grid;
+        grid-template-columns: 1.25fr 0.85fr 1fr;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .admin-nav-btn, .admin-nav-link {
+        padding: 9px 4px;
+        font-size: 0.76rem;
+        justify-content: center;
+        text-align: center;
+        border-radius: 12px;
+        white-space: nowrap;
+        gap: 4px;
+      }
+
+      .admin-card {
+        padding: 18px 14px;
+        border-radius: 16px;
+      }
+
+      .form-label {
+        font-size: 0.84rem;
+      }
+
+      .form-input {
+        padding: 12px 14px;
+        font-size: 0.92rem;
+      }
+
+      .gate-checkbox-wrapper {
+        padding: 10px 12px;
+      }
+
+      .link-actions {
+        gap: 8px;
+      }
+
+      .btn-action-small {
+        padding: 9px 8px;
+        font-size: 0.78rem;
+      }
+
+      .wa-preview-card {
+        padding: 12px;
+      }
+
+      .wa-bubble {
+        padding: 10px 12px;
+        font-size: 0.82rem;
+      }
+
+      .btn-send-whatsapp {
+        padding: 14px 18px;
+        font-size: 0.95rem;
+        border-radius: 25px;
+      }
+
+      .btn-invitation-history {
+        padding: 12px 16px;
+        font-size: 0.88rem;
+        border-radius: 25px;
+      }
+
+      .auth-card {
+        padding: 28px 18px;
+        border-radius: 16px;
+      }
+
+      .history-modal-card {
+        width: 95%;
+        padding: 18px 14px;
+        max-height: 92vh;
+      }
+
+      .history-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
+      .stat-card {
+        padding: 10px 4px;
+      }
+
+      .stat-value {
+        font-size: 1.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.65rem;
+      }
+
+      .history-rel-actions {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .btn-rel-action {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1164,7 +1299,7 @@
           <span>Lock</span>
         </button>
         <a href="index.html" class="admin-nav-link" id="linkBackToCard">
-          <span>View Live Invitation</span>
+          <span>Live Card</span>
           <i class="fa-solid fa-arrow-right"></i>
         </a>
       </div>
@@ -1361,95 +1496,210 @@
       }
 
       // ========================================================
-      // MySQL Database Client (with automatic fallback to local sync)
+      // Hybrid Cloud & MySQL Database Client
+      // Real-time synchronization across Laptop, Phone, and Local MySQL
       // ========================================================
-      class MySQLDatabaseClient {
+      const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fe4aa2796642';
+      const LOCAL_API_BASE = 'http://localhost:3000';
+
+      class HybridDatabaseClient {
         constructor() {
-          this.isMySQL = false;
+          this.connectedType = 'cloud';
         }
 
         async checkStatus() {
           try {
-            const res = await fetch(`${API_BASE}/api/status`, { signal: AbortSignal.timeout(2000) });
+            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(2500) });
+            if (res.ok) {
+              this.updateStatusBadge('Cloud DB Synced');
+              return true;
+            }
+          } catch (e) {}
+
+          try {
+            const res = await fetch(`${LOCAL_API_BASE}/api/status`, { signal: AbortSignal.timeout(1500) });
             if (res.ok) {
               const data = await res.json();
-              this.isMySQL = !!data.connected;
-              this.updateStatusBadge(this.isMySQL);
-              return this.isMySQL;
+              if (data.connected) {
+                this.updateStatusBadge('MySQL Connected');
+                return true;
+              }
             }
-          } catch (e) {
-            this.isMySQL = false;
-            this.updateStatusBadge(false);
-          }
+          } catch (e) {}
+
+          this.updateStatusBadge('Local DB');
           return false;
         }
 
-        updateStatusBadge(connected) {
+        updateStatusBadge(text) {
           const badge = document.getElementById('dbStatusBadge');
           if (!badge) return;
-          if (connected) {
+          if (text.includes('MySQL')) {
             badge.style.background = 'rgba(37, 211, 102, 0.18)';
             badge.style.borderColor = 'rgba(37, 211, 102, 0.5)';
             badge.style.color = '#85f2ad';
-            badge.innerHTML = '<i class="fa-solid fa-database"></i> <span>MySQL Connected</span>';
+            badge.innerHTML = `<i class="fa-solid fa-database"></i> <span>${text}</span>`;
+          } else if (text.includes('Cloud')) {
+            badge.style.background = 'rgba(33, 150, 243, 0.2)';
+            badge.style.borderColor = 'rgba(33, 150, 243, 0.5)';
+            badge.style.color = '#90caf9';
+            badge.innerHTML = `<i class="fa-solid fa-cloud"></i> <span>${text}</span>`;
           } else {
             badge.style.background = 'rgba(255, 193, 7, 0.15)';
             badge.style.borderColor = 'rgba(255, 193, 7, 0.4)';
             badge.style.color = '#ffd54f';
-            badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> <span>Local DB Synced</span>';
+            badge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> <span>${text}</span>`;
           }
-        }
-
-        async save(record) {
-          // Attempt MySQL save first
-          try {
-            const res = await fetch(`${API_BASE}/api/invitations`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(record),
-              signal: AbortSignal.timeout(3000)
-            });
-            if (res.ok) {
-              const result = await res.json();
-              this.isMySQL = true;
-              this.updateStatusBadge(true);
-              this.saveLocalBackup(result.data || record);
-              return { success: true, source: 'mysql', data: result.data };
-            }
-          } catch (e) {
-            this.isMySQL = false;
-            this.updateStatusBadge(false);
-          }
-
-          // Fallback to local storage
-          const localItem = Object.assign({
-            id: Date.now(),
-            created_at: new Date().toISOString()
-          }, record);
-          this.saveLocalBackup(localItem);
-          return { success: true, source: 'local', data: localItem };
         }
 
         async getAll() {
+          let list = [];
+
+          // 1. Try Cloud DB (shared across all devices: laptop & phone)
           try {
-            const res = await fetch(`${API_BASE}/api/invitations`, { signal: AbortSignal.timeout(2500) });
+            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(3500) });
+            if (res.ok) {
+              const json = await res.json();
+              if (json && json.data && Array.isArray(json.data.invitations)) {
+                list = json.data.invitations;
+                localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(list));
+                this.updateStatusBadge('Cloud DB Synced');
+                return this.formatRows(list);
+              }
+            }
+          } catch (e) {}
+
+          // 2. Try Local MySQL if cloud fetch failed
+          try {
+            const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, { signal: AbortSignal.timeout(1500) });
             if (res.ok) {
               const result = await res.json();
-              this.isMySQL = true;
-              this.updateStatusBadge(true);
               if (Array.isArray(result.data)) {
                 localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(result.data));
+                this.updateStatusBadge('MySQL Connected');
                 return this.formatRows(result.data);
               }
             }
-          } catch (e) {
-            this.isMySQL = false;
-            this.updateStatusBadge(false);
-          }
+          } catch (e) {}
 
-          // Fallback to local storage backup
-          const list = this.getLocalBackup();
+          // 3. Fallback to localStorage
+          list = this.getLocalBackup();
+          this.updateStatusBadge('Local DB');
           return this.formatRows(list);
+        }
+
+        async save(record) {
+          const item = Object.assign({
+            id: Date.now(),
+            created_at: new Date().toISOString()
+          }, record);
+
+          // Get current list
+          let currentList = await this.getAllRaw();
+          currentList = currentList.filter(x => (x.name || '').toLowerCase() !== (record.name || '').toLowerCase());
+          currentList.unshift(item);
+
+          let cloudSuccess = false;
+          // 1. Save to Cloud DB (laptop & phone both see it instantly)
+          try {
+            const cloudRes = await fetch(CLOUD_DB_URL, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: 'Juveriya Wedding Invitations',
+                data: { invitations: currentList }
+              }),
+              signal: AbortSignal.timeout(3500)
+            });
+            if (cloudRes.ok) {
+              cloudSuccess = true;
+              this.updateStatusBadge('Cloud DB Synced');
+            }
+          } catch (e) {}
+
+          // 2. Also save to local MySQL if running on laptop
+          try {
+            await fetch(`${LOCAL_API_BASE}/api/invitations`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(record),
+              signal: AbortSignal.timeout(1500)
+            });
+          } catch (e) {}
+
+          // 3. Always update localStorage
+          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(currentList));
+
+          return { success: true, source: cloudSuccess ? 'cloud' : 'local', data: item };
+        }
+
+        async delete(id) {
+          let list = await this.getAllRaw();
+          list = list.filter(x => x.id !== Number(id) && x.id !== id);
+
+          // Update Cloud DB
+          try {
+            await fetch(CLOUD_DB_URL, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: 'Juveriya Wedding Invitations',
+                data: { invitations: list }
+              }),
+              signal: AbortSignal.timeout(3000)
+            });
+          } catch (e) {}
+
+          // Also delete from local MySQL if running
+          try {
+            await fetch(`${LOCAL_API_BASE}/api/invitations/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(1500) });
+          } catch (e) {}
+
+          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(list));
+        }
+
+        async clear() {
+          // Clear Cloud DB
+          try {
+            await fetch(CLOUD_DB_URL, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: 'Juveriya Wedding Invitations',
+                data: { invitations: [] }
+              }),
+              signal: AbortSignal.timeout(3000)
+            });
+          } catch (e) {}
+
+          // Clear local MySQL
+          try {
+            await fetch(`${LOCAL_API_BASE}/api/invitations`, { method: 'DELETE', signal: AbortSignal.timeout(1500) });
+          } catch (e) {}
+
+          localStorage.removeItem(LOCAL_BACKUP_KEY);
+        }
+
+        async getAllRaw() {
+          try {
+            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(2500) });
+            if (res.ok) {
+              const json = await res.json();
+              if (json && json.data && Array.isArray(json.data.invitations)) {
+                return json.data.invitations;
+              }
+            }
+          } catch (e) {}
+          return this.getLocalBackup();
+        }
+
+        getLocalBackup() {
+          try {
+            const raw = localStorage.getItem(LOCAL_BACKUP_KEY) || localStorage.getItem('juveriya_sent_relatives_list');
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return [];
+          }
         }
 
         formatRows(rows) {
@@ -1461,7 +1711,7 @@
               id: r.id,
               name: r.name,
               withFamily: Boolean(r.with_family !== undefined ? r.with_family : r.withFamily),
-              greeting: r.greeting || (r.with_family ? `${r.name} with Family` : r.name),
+              greeting: r.greeting || (r.withFamily ? `${r.name} with Family` : r.name),
               inviteUrl: r.invite_url || r.inviteUrl,
               message: r.message,
               date,
@@ -1475,41 +1725,9 @@
           const list = await this.getAll();
           return list.length;
         }
-
-        async delete(id) {
-          try {
-            await fetch(`${API_BASE}/api/invitations/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(2500) });
-          } catch (e) {}
-
-          const list = this.getLocalBackup().filter(x => x.id !== Number(id) && x.id !== id);
-          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(list));
-        }
-
-        async clear() {
-          try {
-            await fetch(`${API_BASE}/api/invitations`, { method: 'DELETE', signal: AbortSignal.timeout(2500) });
-          } catch (e) {}
-          localStorage.removeItem(LOCAL_BACKUP_KEY);
-        }
-
-        getLocalBackup() {
-          try {
-            const raw = localStorage.getItem(LOCAL_BACKUP_KEY) || localStorage.getItem('juveriya_sent_relatives_list');
-            return raw ? JSON.parse(raw) : [];
-          } catch (e) {
-            return [];
-          }
-        }
-
-        saveLocalBackup(item) {
-          const list = this.getLocalBackup();
-          const filtered = list.filter(x => (x.name || '').toLowerCase() !== (item.name || '').toLowerCase());
-          filtered.unshift(item);
-          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(filtered.slice(0, 100)));
-        }
       }
 
-      const db = new MySQLDatabaseClient();
+      const db = new HybridDatabaseClient();
 
       // ========================================================
       // DOM Elements
@@ -1648,7 +1866,11 @@
         await updateCounters();
 
         // 3. Show Database confirmation toast
-        const sourceText = (saveRes && saveRes.source === 'mysql') ? 'MySQL Database' : 'Database';
+        const sourceText = (saveRes && saveRes.source === 'cloud') 
+          ? 'Cloud Database (Synced)' 
+          : (saveRes && saveRes.source === 'mysql') 
+            ? 'MySQL Database' 
+            : 'Database';
         showToast(`Saved ${greeting} in ${sourceText}! Opening WhatsApp...`);
 
         // 4. Launch WhatsApp (opens contact picker)
