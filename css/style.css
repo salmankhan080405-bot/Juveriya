@@ -1014,38 +1014,39 @@ body {
    ========================================================================== */
 .wax-seal-wrapper {
   position: absolute;
-  top: 52%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) translateZ(40px);
   z-index: 50;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+  pointer-events: auto;
 }
 
-/* Big Royal TAP Button under AJ Seal */
+/* Big Royal TAP Button perfectly centered under AJ Seal */
 .card-tap-btn {
+  position: absolute;
+  top: calc(100% + 28px);
+  left: 50%;
+  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 15px 36px;
+  padding: 14px 34px;
   background: linear-gradient(135deg, #c59b27 0%, #fffadb 45%, #ffd700 80%, #977014 100%);
   color: #031c15;
   border: 2px solid #ffffff;
   border-radius: 50px;
   font-family: var(--font-heading);
-  font-size: 1.28rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  letter-spacing: 2.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 
     0 12px 35px rgba(0, 0, 0, 0.85),
-    0 0 30px rgba(255, 215, 0, 0.7),
+    0 0 25px rgba(255, 215, 0, 0.7),
     inset 0 1px 3px rgba(255, 255, 255, 0.9);
   animation: tapButtonPulse 2.2s infinite ease-in-out;
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);

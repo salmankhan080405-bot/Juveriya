@@ -375,6 +375,9 @@
     }
   }
 
+  // Expose toggleCardFold globally so onclick="toggleCardFold()" works infallibly
+  window.toggleCardFold = toggleCardFold;
+
   // =========================================================================
   // Interactive 3D Perspective Tilt on Mouse/Touch Move
   // =========================================================================
@@ -680,18 +683,33 @@
   // =========================================================================
   function initEvents() {
     // Guest Gate Form
-    guestGateForm.addEventListener('submit', handleGateSubmit);
-    btnEditGuestName.addEventListener('click', reopenGuestGate);
+    if (guestGateForm) guestGateForm.addEventListener('submit', handleGateSubmit);
+    if (btnEditGuestName) btnEditGuestName.addEventListener('click', reopenGuestGate);
 
     // Wax Seal, Big TAP button & Fold Toggle
-    if (waxSeal) waxSeal.addEventListener('click', toggleCardFold);
-    if (waxSealWrapper) waxSealWrapper.addEventListener('click', toggleCardFold);
+    if (waxSeal) {
+      waxSeal.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCardFold();
+      });
+    }
+    if (waxSealWrapper) {
+      waxSealWrapper.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCardFold();
+      });
+    }
     const cardTapBtn = document.getElementById('cardTapBtn');
-    if (cardTapBtn) cardTapBtn.addEventListener('click', toggleCardFold);
+    if (cardTapBtn) {
+      cardTapBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCardFold();
+      });
+    }
     if (btnFoldToggle) btnFoldToggle.addEventListener('click', toggleCardFold);
     if (fabToggleFold) fabToggleFold.addEventListener('click', toggleCardFold);
 
-    // Clicking on wedding card folds/unfolds (ignore clicks on links)
+    // Clicking on wedding card folds/unfolds (ignore clicks on links or interactive buttons)
     if (weddingCard) {
       weddingCard.addEventListener('click', (e) => {
         if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
