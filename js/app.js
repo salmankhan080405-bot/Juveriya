@@ -356,8 +356,10 @@
 
     if (isOpen) {
       weddingCard.classList.add('is-open');
-      btnFoldToggle.classList.add('active');
-      btnFoldToggle.innerHTML = '<i class="fa-solid fa-door-closed"></i> <span class="btn-text">Fold Card</span>';
+      if (btnFoldToggle) {
+        btnFoldToggle.classList.add('active');
+        btnFoldToggle.innerHTML = '<i class="fa-solid fa-door-closed"></i> <span class="btn-text">Fold Card</span>';
+      }
       
       // Auto-start ambient melody on first reveal if not playing yet
       if (!isAudioPlaying && !sessionStorage.getItem('audioPrompted')) {
@@ -366,8 +368,10 @@
       }
     } else {
       weddingCard.classList.remove('is-open');
-      btnFoldToggle.classList.remove('active');
-      btnFoldToggle.innerHTML = '<i class="fa-solid fa-door-open"></i> <span class="btn-text">Open Card</span>';
+      if (btnFoldToggle) {
+        btnFoldToggle.classList.remove('active');
+        btnFoldToggle.innerHTML = '<i class="fa-solid fa-door-open"></i> <span class="btn-text">Open Card</span>';
+      }
     }
   }
 
@@ -679,34 +683,52 @@
     guestGateForm.addEventListener('submit', handleGateSubmit);
     btnEditGuestName.addEventListener('click', reopenGuestGate);
 
-    // Wax Seal & Fold Toggle
-    waxSeal.addEventListener('click', toggleCardFold);
-    waxSealWrapper.addEventListener('click', toggleCardFold);
-    btnFoldToggle.addEventListener('click', toggleCardFold);
-    fabToggleFold.addEventListener('click', toggleCardFold);
+    // Wax Seal, Big TAP button & Fold Toggle
+    if (waxSeal) waxSeal.addEventListener('click', toggleCardFold);
+    if (waxSealWrapper) waxSealWrapper.addEventListener('click', toggleCardFold);
+    const cardTapBtn = document.getElementById('cardTapBtn');
+    if (cardTapBtn) cardTapBtn.addEventListener('click', toggleCardFold);
+    if (btnFoldToggle) btnFoldToggle.addEventListener('click', toggleCardFold);
+    if (fabToggleFold) fabToggleFold.addEventListener('click', toggleCardFold);
 
-    // Navigation Controls
-    btnAudioToggle.addEventListener('click', toggleAudio);
-    btnPetalsToggle.addEventListener('click', togglePetals);
+    // Clicking on wedding card folds/unfolds (ignore clicks on links)
+    if (weddingCard) {
+      weddingCard.addEventListener('click', (e) => {
+        if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
+        toggleCardFold();
+      });
+    }
 
-    // 3D Photos Gallery Modal
-    btnGalleryToggle.addEventListener('click', () => {
-      galleryModal.classList.add('is-active');
-    });
-    btnCloseGallery.addEventListener('click', () => {
-      galleryModal.classList.remove('is-active');
-    });
+    // Navigation Controls (Optional)
+    if (btnAudioToggle) btnAudioToggle.addEventListener('click', toggleAudio);
+    if (btnPetalsToggle) btnPetalsToggle.addEventListener('click', togglePetals);
 
-    // Customizer Modal
-    btnCustomizeToggle.addEventListener('click', () => {
-      populateCustomizerForm(loadCardData());
-      customizerModal.classList.add('is-active');
-    });
-    btnCloseCustomizer.addEventListener('click', () => {
-      customizerModal.classList.remove('is-active');
-    });
-    customizerForm.addEventListener('submit', handleCustomizerSubmit);
-    btnResetDefaults.addEventListener('click', handleResetDefaults);
+    // 3D Photos Gallery Modal (Optional)
+    if (btnGalleryToggle) {
+      btnGalleryToggle.addEventListener('click', () => {
+        if (galleryModal) galleryModal.classList.add('is-active');
+      });
+    }
+    if (btnCloseGallery) {
+      btnCloseGallery.addEventListener('click', () => {
+        if (galleryModal) galleryModal.classList.remove('is-active');
+      });
+    }
+
+    // Customizer Modal (Optional)
+    if (btnCustomizeToggle) {
+      btnCustomizeToggle.addEventListener('click', () => {
+        populateCustomizerForm(loadCardData());
+        if (customizerModal) customizerModal.classList.add('is-active');
+      });
+    }
+    if (btnCloseCustomizer) {
+      btnCloseCustomizer.addEventListener('click', () => {
+        if (customizerModal) customizerModal.classList.remove('is-active');
+      });
+    }
+    if (customizerForm) customizerForm.addEventListener('submit', handleCustomizerSubmit);
+    if (btnResetDefaults) btnResetDefaults.addEventListener('click', handleResetDefaults);
 
     // Close Modals on backdrop click
     [galleryModal, customizerModal, document.getElementById('waSenderModal')].forEach(modal => {
@@ -719,10 +741,10 @@
     });
 
     // Card Actions
-    btnShareWhatsapp.addEventListener('click', shareOnWhatsApp);
-    btnAddToCalendar.addEventListener('click', generateCalendarEvent);
-    fabPrintCard.addEventListener('click', () => window.print());
-    fabDirections.addEventListener('click', openVenuesMap);
+    if (btnShareWhatsapp) btnShareWhatsapp.addEventListener('click', shareOnWhatsApp);
+    if (btnAddToCalendar) btnAddToCalendar.addEventListener('click', generateCalendarEvent);
+    if (fabPrintCard) fabPrintCard.addEventListener('click', () => window.print());
+    if (fabDirections) fabDirections.addEventListener('click', openVenuesMap);
 
     // WhatsApp Relative Sender Tool Initialization
     initWaRelativeSender();

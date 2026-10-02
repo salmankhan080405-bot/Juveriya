@@ -1014,12 +1014,93 @@ body {
    ========================================================================== */
 .wax-seal-wrapper {
   position: absolute;
-  top: 50%;
+  top: 52%;
   left: 50%;
   transform: translate(-50%, -50%) translateZ(40px);
   z-index: 50;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+}
+
+/* Big Royal TAP Button under AJ Seal */
+.card-tap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px 36px;
+  background: linear-gradient(135deg, #c59b27 0%, #fffadb 45%, #ffd700 80%, #977014 100%);
+  color: #031c15;
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+  font-family: var(--font-heading);
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(255, 215, 0, 0.7),
+    inset 0 1px 3px rgba(255, 255, 255, 0.9);
+  animation: tapButtonPulse 2.2s infinite ease-in-out;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+}
+
+.card-tap-btn .tap-icon {
+  font-size: 1.35rem;
+  color: #031c15;
+  animation: tapHandBounce 1.5s infinite ease-in-out;
+}
+
+@keyframes tapButtonPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 12px 35px rgba(0, 0, 0, 0.85),
+      0 0 25px rgba(255, 215, 0, 0.6);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 
+      0 16px 45px rgba(0, 0, 0, 0.95),
+      0 0 45px rgba(255, 215, 0, 0.9);
+  }
+}
+
+@keyframes tapHandBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.card-tap-btn:hover {
+  transform: scale(1.08) translateY(-2px);
+  background: linear-gradient(135deg, #dfb76c 0%, #ffffff 45%, #ffd700 80%, #b38422 100%);
+  box-shadow: 
+    0 18px 50px rgba(0, 0, 0, 0.95),
+    0 0 50px rgba(255, 215, 0, 0.95);
+}
+
+@media (max-width: 600px) {
+  .card-tap-btn {
+    padding: 12px 28px;
+    font-size: 1.08rem;
+    letter-spacing: 2px;
+  }
+  .card-tap-btn .tap-icon {
+    font-size: 1.15rem;
+  }
 }
 
 .wax-seal {
