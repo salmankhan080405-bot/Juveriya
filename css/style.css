@@ -1,0 +1,1846 @@
+/* ==========================================================================
+   Royal Islamic 3D Wedding Card Styles
+   Bride: Juveriya | Groom: Abdul Hadi
+   Theme: Royal Emerald Green Velvet & Embossed Foil Gold
+   ========================================================================== */
+
+:root {
+  --color-emerald-deep: #031c15;
+  --color-emerald-dark: #06281e;
+  --color-emerald-mid: #0b3d2f;
+  --color-emerald-accent: #115743;
+  --color-gold-light: #fff0bd;
+  --color-gold-bright: #ffd700;
+  --color-gold-champagne: #ecd08c;
+  --color-gold-primary: #dfb76c;
+  --color-gold-dark: #a87920;
+  --color-gold-border: rgba(223, 183, 108, 0.45);
+  
+  --font-arabic: 'Amiri', serif;
+  --font-heading: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-serif: 'Cinzel', serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-body: 'Playfair Display', serif;
+  --font-sans: 'Montserrat', sans-serif;
+  
+  --card-width: 440px;
+  --card-height: 640px;
+  --card-scale: 1;
+  --shadow-elevation: 0 25px 60px rgba(0, 0, 0, 0.75), 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 35%, #182823 0%, #081310 60%, #030806 100%);
+  color: var(--color-gold-light);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  position: relative;
+  user-select: none;
+}
+
+/* Background Animated Canvas (Petals & Sparkles) */
+#particlesCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   1. GUEST NAME ENTRY GATE SCREEN (Before reaching the invitation)
+   ========================================================================== */
+.guest-gate-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: 
+    radial-gradient(circle at 50% 30%, #0d4e3b 0%, #06281e 50%, #02120e 100%),
+    #031c15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.8s ease;
+}
+
+.guest-gate-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.guest-gate-card {
+  width: 100%;
+  max-width: 520px;
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(17, 87, 67, 0.7) 0%, rgba(6, 40, 30, 0.95) 70%, #031c15 100%),
+    #06281e;
+  border: 2px solid transparent;
+  border-image: linear-gradient(135deg, #dfb76c, #ffe49e 50%, #977014) 1;
+  border-radius: 16px;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(223, 183, 108, 0.25);
+  padding: 32px 28px;
+  text-align: center;
+  position: relative;
+  animation: gateCardEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes gateCardEntrance {
+  0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.gate-gold-border {
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  border-radius: 10px;
+  padding: 28px 20px 24px;
+  position: relative;
+}
+
+.gate-bismillah-box {
+  margin-bottom: 12px;
+}
+
+.gate-bismillah-arabic {
+  font-family: var(--font-arabic);
+  font-size: 2.3rem;
+  line-height: 1.4;
+  background: linear-gradient(180deg, #fffadb 0%, #dfb76c 60%, #977014 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+
+.gate-bismillah-sub {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: var(--color-gold-champagne);
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.gate-divider-gold {
+  color: var(--color-gold-primary);
+  font-size: 0.85rem;
+  letter-spacing: 6px;
+  margin: 12px 0 14px;
+}
+
+.gate-wedding-badge {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-gold-light);
+  background: rgba(11, 61, 47, 0.8);
+  border: 1px solid var(--color-gold-border);
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.gate-couple-names {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #fffadb 0%, #dfb76c 40%, #ffd700 75%, #977014 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 18px;
+}
+
+.gate-prompt-box {
+  margin-bottom: 18px;
+}
+
+.gate-prompt-text {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  color: var(--color-gold-light);
+  line-height: 1.4;
+}
+
+.gate-guest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gate-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.gate-input-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--color-gold-primary);
+  font-size: 1.1rem;
+}
+
+.gate-guest-input {
+  width: 100%;
+  padding: 14px 16px 14px 46px;
+  background: rgba(3, 28, 21, 0.85);
+  border: 1.5px solid var(--color-gold-primary);
+  border-radius: 30px;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  outline: none;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+}
+
+.gate-guest-input:focus {
+  border-color: var(--color-gold-bright);
+  box-shadow: 
+    0 0 16px rgba(255, 215, 0, 0.45),
+    inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.gate-guest-input::placeholder {
+  color: rgba(223, 183, 108, 0.55);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+}
+
+.gate-checkbox-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0 18px;
+}
+
+.gate-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-gold-champagne);
+  cursor: pointer;
+}
+
+.gate-checkbox-label input[type="checkbox"] {
+  accent-color: var(--color-gold-primary);
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
+
+.gold-text {
+  color: var(--color-gold-bright);
+  font-weight: 600;
+}
+
+.gate-submit-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #c59b27 0%, #ffe49e 45%, #dfb76c 80%, #977014 100%);
+  color: #031c15;
+  border: 1px solid #ffe49e;
+  border-radius: 30px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(223, 183, 108, 0.4);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.gate-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.6);
+  background: linear-gradient(135deg, #dfb76c 0%, #fffadb 45%, #ffd700 80%, #a87920 100%);
+}
+
+/* ==========================================================================
+   Header & Top Navigation
+   ========================================================================== */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 28px;
+  background: rgba(3, 28, 21, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(223, 183, 108, 0.25);
+}
+
+.brand-monogram {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold-primary), var(--color-gold-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 10px rgba(223, 183, 108, 0.3);
+}
+
+.monogram-amp {
+  font-family: var(--font-script);
+  font-size: 1.5rem;
+  color: var(--color-gold-bright);
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--color-gold-light);
+  background: rgba(11, 61, 47, 0.65);
+  border: 1px solid var(--color-gold-border);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.nav-btn:hover {
+  background: rgba(223, 183, 108, 0.18);
+  border-color: var(--color-gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(223, 183, 108, 0.25);
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, rgba(223, 183, 108, 0.3), rgba(11, 61, 47, 0.8));
+  border-color: var(--color-gold-bright);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.35);
+}
+
+.nav-btn-primary {
+  background: linear-gradient(135deg, #977014 0%, #dfb76c 50%, #c59b27 100%);
+  color: #031c15;
+  font-weight: 600;
+  border: 1px solid #ffe49e;
+}
+
+.nav-btn-primary:hover {
+  background: linear-gradient(135deg, #c59b27 0%, #ffe49e 50%, #dfb76c 100%);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* ==========================================================================
+   2. PERSONALIZED GUEST INVITATION RIBBON (Above the 3D card)
+   ========================================================================== */
+.scene-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 90px 20px 80px;
+  position: relative;
+  z-index: 10;
+}
+
+.guest-invitation-ribbon {
+  margin-bottom: 22px;
+  animation: ribbonGlow 3s ease-in-out infinite alternate;
+  width: 100%;
+  max-width: 520px;
+}
+
+@keyframes ribbonGlow {
+  0% { transform: translateY(0); filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.6)); }
+  100% { transform: translateY(-3px); filter: drop-shadow(0 8px 24px rgba(223, 183, 108, 0.3)); }
+}
+
+.ribbon-inner {
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(17, 87, 67, 0.85) 0%, rgba(6, 40, 30, 0.95) 75%),
+    #06281e;
+  border: 1.5px solid var(--color-gold-primary);
+  border-radius: 40px;
+  padding: 10px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.ribbon-bismillah {
+  font-family: var(--font-arabic);
+  font-size: 1.35rem;
+  background: linear-gradient(180deg, #fffadb, #dfb76c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1.2;
+}
+
+.ribbon-text-line {
+  font-family: var(--font-serif);
+  font-size: 0.76rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-gold-champagne);
+  margin-top: 2px;
+}
+
+.ribbon-guest-name {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  background: linear-gradient(135deg, #fffadb 0%, #dfb76c 45%, #ffd700 70%, #977014 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 3px 0 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.family-badge {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-style: italic;
+  font-weight: normal;
+  color: var(--color-gold-light);
+  background: rgba(223, 183, 108, 0.15);
+  border: 1px solid rgba(223, 183, 108, 0.4);
+  padding: 2px 10px;
+  border-radius: 14px;
+}
+
+.btn-edit-guest {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(11, 61, 47, 0.7);
+  border: 1px solid var(--color-gold-border);
+  color: var(--color-gold-light);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  padding: 5px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-guest:hover {
+  background: var(--color-gold-primary);
+  color: #031c15;
+}
+
+/* ==========================================================================
+   3. 3D PERSPECTIVE VIEWPORT & CARD BODY
+   ========================================================================== */
+.card-3d-wrapper {
+  perspective: 1600px;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(var(--card-scale));
+  transition: transform 0.3s ease;
+}
+
+.wedding-card-3d {
+  position: relative;
+  width: var(--card-width);
+  height: var(--card-height);
+  transform-style: preserve-3d;
+  box-shadow: var(--shadow-elevation);
+  border-radius: 12px;
+  cursor: default;
+  transition: transform 0.5s cubic-bezier(0.15, 0.9, 0.25, 1);
+}
+
+/* Dynamic Sheen Overlay (moves with mouse tilt) */
+.card-foil-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0) 30%, rgba(255, 240, 189, 0.15) 48%, rgba(255, 255, 255, 0) 65%);
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+}
+
+/* ==========================================================================
+   4. FRONT EMBOSSED BISMILLAH ARABIC CALLIGRAPHY ARCH
+   "remove everything just keep Bismillah irahman nir raheem in Arabic with good design"
+   ========================================================================== */
+.front-bismillah-wrapper {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(40px);
+  z-index: 45;
+  width: 82%;
+  pointer-events: none;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
+}
+
+.front-bismillah-card {
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(13, 78, 59, 0.95) 0%, rgba(6, 40, 30, 0.98) 75%),
+    #06281e;
+  border: 1.5px solid var(--color-gold-primary);
+  border-radius: 14px;
+  padding: 16px 14px 14px;
+  text-align: center;
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.8),
+    0 0 25px rgba(223, 183, 108, 0.35);
+  position: relative;
+}
+
+.front-arch-finial {
+  font-size: 0.85rem;
+  color: var(--color-gold-bright);
+  letter-spacing: 4px;
+  margin-bottom: 2px;
+}
+
+.front-bismillah-arabic {
+  font-family: var(--font-arabic);
+  font-size: 2.15rem;
+  line-height: 1.35;
+  background: linear-gradient(180deg, #fffadb 0%, #dfb76c 40%, #ffd700 70%, #977014 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+}
+
+.front-arch-underline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.gold-vine-left, .gold-vine-right {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold-primary), transparent);
+}
+
+.gold-vine-center {
+  color: var(--color-gold-primary);
+  font-size: 0.75rem;
+}
+
+/* When the card is opened, front Bismillah crest gracefully dissolves away */
+.wedding-card-3d.is-open .front-bismillah-wrapper {
+  transform: translate(-50%, -50%) translateZ(-20px) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   5. GATEFOLD 3D DOORS / FLAPS
+   Left Flap: Hinged on left edge (transform-origin: left center)
+   Right Flap: Hinged on right edge (transform-origin: right center)
+   ========================================================================== */
+.gate-flap {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1.25s cubic-bezier(0.25, 1, 0.35, 1);
+  z-index: 30;
+}
+
+.flap-left {
+  left: 0;
+  transform-origin: left center;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.flap-right {
+  right: 0;
+  transform-origin: right center;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Open Card State */
+.wedding-card-3d.is-open .flap-left {
+  transform: rotateY(-172deg);
+  box-shadow: -15px 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.wedding-card-3d.is-open .flap-right {
+  transform: rotateY(172deg);
+  box-shadow: 15px 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+/* Double-sided Faces of Flap */
+.flap-side {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Outer Face (Clean Emerald Velvet & Gold Mandala - NO English clutter) */
+.flap-front {
+  transform: rotateY(0deg);
+  background: 
+    radial-gradient(circle at 50% 50%, #0d4e3b 0%, #06281e 60%, #02140f 100%),
+    repeating-linear-gradient(45deg, rgba(223, 183, 108, 0.03) 0, rgba(223, 183, 108, 0.03) 1px, transparent 0, transparent 12px),
+    #06281e;
+  border: 1px solid rgba(223, 183, 108, 0.4);
+  box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.85);
+}
+
+.flap-left .flap-front {
+  border-right: 1px solid rgba(223, 183, 108, 0.7);
+}
+
+.flap-right .flap-front {
+  border-left: 1px solid rgba(223, 183, 108, 0.7);
+}
+
+.flap-outer-content {
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Half Mandalas at the center seam */
+.side-mandala-ornament {
+  position: absolute;
+  top: 50%;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 2px dashed var(--color-gold-primary);
+  background: radial-gradient(circle, rgba(223, 183, 108, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.left-mandala {
+  right: -70px;
+  border-right: 4px solid var(--color-gold-bright);
+}
+
+.right-mandala {
+  left: -70px;
+  border-left: 4px solid var(--color-gold-bright);
+}
+
+.flap-outer-border {
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.flap-ornate-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--color-gold-primary);
+}
+
+.flap-left .flap-ornate-corner.top {
+  top: 8px; left: 8px; border-right: none; border-bottom: none;
+}
+.flap-left .flap-ornate-corner.bottom {
+  bottom: 8px; left: 8px; border-right: none; border-top: none;
+}
+.flap-right .flap-ornate-corner.top {
+  top: 8px; right: 8px; border-left: none; border-bottom: none;
+}
+.flap-right .flap-ornate-corner.bottom {
+  bottom: 8px; right: 8px; border-left: none; border-top: none;
+}
+
+/* Inner Face (Revealed when opened) */
+.flap-back {
+  transform: rotateY(180deg);
+  background: 
+    radial-gradient(circle at 50% 50%, #083427 0%, #041c15 80%),
+    #05231a;
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+.flap-inner-content {
+  height: 100%;
+  padding: 14px 10px;
+}
+
+.inner-border-frame {
+  height: 100%;
+  border: 1px solid rgba(223, 183, 108, 0.3);
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+}
+
+/* Inner Left Flap: Islamic Dua */
+.inner-header-icon {
+  font-size: 1.3rem;
+  color: var(--color-gold-bright);
+}
+
+.flap-title {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  color: var(--color-gold-light);
+  margin: 6px 0 10px;
+}
+
+.arabic-dua {
+  font-family: var(--font-arabic);
+  font-size: 1.15rem;
+  line-height: 1.6;
+  background: linear-gradient(180deg, #fff3c4, #dfb76c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 0 4px;
+}
+
+.dua-meaning {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--color-gold-champagne);
+  margin-top: 8px;
+}
+
+.decorative-separator {
+  color: var(--color-gold-primary);
+  font-size: 0.65rem;
+  letter-spacing: 6px;
+  margin: 10px 0;
+}
+
+.family-blessing h4 {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.8px;
+  color: var(--color-gold-bright);
+  margin-bottom: 4px;
+}
+
+.family-blessing p {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--color-gold-light);
+  line-height: 1.3;
+}
+
+/* Inner Right Flap: Events & Venues */
+.event-detail-box {
+  background: rgba(3, 28, 21, 0.45);
+  border: 1px solid rgba(223, 183, 108, 0.2);
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.event-icon {
+  color: var(--color-gold-bright);
+  font-size: 0.8rem;
+}
+
+.event-title {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  background: linear-gradient(135deg, #fffadb, #dfb76c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.event-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+
+.event-date {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-gold-light);
+}
+
+.event-time {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  color: var(--color-gold-bright);
+}
+
+.event-venue {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--color-gold-champagne);
+}
+
+.event-venue strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 0.7rem;
+  color: var(--color-gold-light);
+  letter-spacing: 0.5px;
+}
+
+.event-mini-divider {
+  font-size: 0.65rem;
+  color: var(--color-gold-primary);
+  letter-spacing: 3px;
+  margin: 6px 0;
+}
+
+.rsvp-footer {
+  margin-top: 6px;
+  border-top: 1px dashed rgba(223, 183, 108, 0.3);
+  padding-top: 6px;
+}
+
+.rsvp-title {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--color-gold-bright);
+  margin-bottom: 2px;
+}
+
+.rsvp-contact {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  color: var(--color-gold-light);
+}
+
+.contact-phone-link {
+  color: var(--color-gold-light);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.contact-phone-link:hover {
+  color: var(--color-gold-bright);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   6. ROYAL GOLDEN WAX SEAL (Centered at Seam)
+   ========================================================================== */
+.wax-seal-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(40px);
+  z-index: 50;
+  cursor: pointer;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+}
+
+.wax-seal {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle at 35% 35%, #fff0bd 0%, #dfb76c 35%, #b38422 70%, #704f0c 100%);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(223, 183, 108, 0.4),
+    inset 0 3px 6px rgba(255, 255, 255, 0.4),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.6);
+  border: 3px solid #ffe49e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wax-seal:hover {
+  transform: scale(1.08);
+  box-shadow: 
+    0 14px 30px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(255, 215, 0, 0.6);
+}
+
+.seal-inner-emboss {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 1px dashed rgba(80, 50, 6, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+.seal-arabic {
+  font-family: var(--font-arabic);
+  font-size: 0.92rem;
+  color: #3b2803;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+  line-height: 1.1;
+}
+
+.seal-initials {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2e1e02;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  line-height: 1;
+  margin: 2px 0;
+}
+
+.seal-subtext {
+  font-family: var(--font-sans);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #3b2803;
+}
+
+.seal-glow-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  animation: sealGlow 2.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes sealGlow {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.12); opacity: 0.9; }
+}
+
+/* Wax Seal state when opened */
+.wedding-card-3d.is-open .wax-seal-wrapper {
+  transform: translate(-50%, -50%) translateZ(-30px) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   7. CENTER PANEL (Main Invitation Card inside)
+   ========================================================================== */
+.card-center {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 50% 30%, rgba(17, 87, 67, 0.55) 0%, rgba(6, 40, 30, 0.95) 70%, #031c15 100%),
+    radial-gradient(circle, rgba(223, 183, 108, 0.04) 1px, transparent 1px) 0 0 / 24px 24px,
+    #06281e;
+  border-radius: 12px;
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.gold-border-frame {
+  height: 100%;
+  border: 2px solid transparent;
+  border-image: linear-gradient(135deg, #dfb76c, #ffe49e 50%, #977014) 1;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  position: relative;
+  background: rgba(3, 28, 21, 0.4);
+}
+
+/* Corner Mandalas */
+.corner-ornament {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--color-gold-primary);
+  pointer-events: none;
+  z-index: 5;
+}
+.corner-ornament.top-left {
+  top: 8px; left: 8px; border-right: none; border-bottom: none;
+}
+.corner-ornament.top-right {
+  top: 8px; right: 8px; border-left: none; border-bottom: none;
+}
+.corner-ornament.bottom-left {
+  bottom: 8px; left: 8px; border-right: none; border-top: none;
+}
+.corner-ornament.bottom-right {
+  bottom: 8px; right: 8px; border-left: none; border-top: none;
+}
+
+/* Bismillah inside center */
+.bismillah-container {
+  margin-top: 2px;
+}
+
+.arabic-bismillah {
+  font-family: var(--font-arabic);
+  font-size: 1.65rem;
+  line-height: 1.35;
+  background: linear-gradient(180deg, #fff3c4 0%, #dfb76c 60%, #a87920 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.bismillah-translation {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: var(--color-gold-champagne);
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+/* Personalized Greeting Box inside Card */
+.card-personalized-guest-box {
+  background: rgba(11, 61, 47, 0.45);
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  border-radius: 8px;
+  padding: 4px 14px;
+  margin: 4px 0 2px;
+  width: 90%;
+}
+
+.guest-cordial-line {
+  font-family: var(--font-serif);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-champagne);
+  display: block;
+}
+
+.card-guest-full-name {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--color-gold-bright);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.card-guest-full-name .guest-family-suffix {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: normal;
+  color: var(--color-gold-light);
+}
+
+/* Invitation Greeting */
+.invitation-intro {
+  margin: 4px 0 2px;
+}
+
+.intro-line-1, .intro-line-2 {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.6px;
+  color: var(--color-gold-light);
+  line-height: 1.35;
+}
+
+/* Couple Presentation */
+.couple-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 2px 0;
+  width: 100%;
+}
+
+.person {
+  width: 100%;
+}
+
+.person-name {
+  font-family: var(--font-heading);
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #fffadb 0%, #dfb76c 45%, #ffd700 70%, #977014 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 8px rgba(223, 183, 108, 0.25);
+  margin-bottom: 2px;
+}
+
+.parent-info {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-gold-champagne);
+  opacity: 0.95;
+}
+
+.knot-connector {
+  margin: 1px 0;
+}
+
+.gold-knot-symbol {
+  font-family: var(--font-script);
+  font-size: 2.1rem;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffe49e, #dfb76c, #977014);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Center Divider */
+.gold-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  gap: 12px;
+  margin: 2px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold-primary), transparent);
+}
+
+.divider-diamond {
+  font-size: 0.75rem;
+  color: var(--color-gold-primary);
+  letter-spacing: 3px;
+}
+
+/* Quranic Blessing */
+.card-blessing-quote {
+  padding: 2px 8px;
+}
+
+.quran-quote {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--color-gold-light);
+}
+
+.quran-surah {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  color: var(--color-gold-champagne);
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+/* Card Quick Action Buttons */
+.card-quick-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.card-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 20px;
+  border: 1px solid var(--color-gold-border);
+  background: rgba(11, 61, 47, 0.8);
+  color: var(--color-gold-light);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.card-action-btn:hover {
+  background: var(--color-gold-primary);
+  color: #031c15;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(223, 183, 108, 0.4);
+}
+
+/* ==========================================================================
+   Floating Action Toolbar (Bottom)
+   ========================================================================== */
+.floating-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(3, 28, 21, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 8px 16px;
+  border-radius: 40px;
+  border: 1px solid rgba(223, 183, 108, 0.3);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.fab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-gold-light);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.fab-btn:hover {
+  background: rgba(223, 183, 108, 0.2);
+  color: var(--color-gold-bright);
+}
+
+.fab-btn i {
+  font-size: 1rem;
+  color: var(--color-gold-primary);
+}
+
+/* ==========================================================================
+   Modals (Gallery & Customizer)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-backdrop.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  background: 
+    radial-gradient(circle at 50% 20%, #0d4e3b 0%, #06281e 70%, #031c15 100%),
+    #06281e;
+  border: 1px solid var(--color-gold-primary);
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(223, 183, 108, 0.2);
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px) scale(0.96);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-backdrop.is-active .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(223, 183, 108, 0.25);
+  background: rgba(3, 28, 21, 0.5);
+}
+
+.modal-header h3 {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  color: var(--color-gold-champagne);
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.modal-desc {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-gold-champagne);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Gallery Grid */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.gallery-item {
+  background: rgba(3, 28, 21, 0.7);
+  border: 1px solid rgba(223, 183, 108, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gallery-badge {
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--color-gold-light);
+  background: rgba(11, 61, 47, 0.8);
+  border-bottom: 1px solid rgba(223, 183, 108, 0.2);
+  text-align: center;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.gallery-item img:hover {
+  transform: scale(1.03);
+}
+
+.gallery-actions {
+  padding: 12px;
+  text-align: center;
+  background: rgba(3, 28, 21, 0.8);
+}
+
+.download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: #031c15;
+  background: linear-gradient(135deg, #ffe49e, #dfb76c);
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.download-link:hover {
+  background: linear-gradient(135deg, #dfb76c, #ffe49e);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(223, 183, 108, 0.4);
+}
+
+.ref-tag {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--color-gold-champagne);
+  opacity: 0.8;
+}
+
+/* Customizer Form Styles */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--color-gold-light);
+}
+
+.form-group input,
+.form-group textarea {
+  background: rgba(3, 28, 21, 0.7);
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--color-gold-bright);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+}
+
+.form-fieldset {
+  border: 1px solid rgba(223, 183, 108, 0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: rgba(3, 28, 21, 0.3);
+}
+
+.form-fieldset legend {
+  padding: 0 8px;
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-gold-bright);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(223, 183, 108, 0.2);
+}
+
+.btn-secondary {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid rgba(223, 183, 108, 0.35);
+  color: var(--color-gold-light);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(223, 183, 108, 0.15);
+}
+
+.btn-primary {
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #dfb76c, #ffe49e 50%, #977014);
+  color: #031c15;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(223, 183, 108, 0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 900px) {
+  :root {
+    --card-width: 380px;
+    --card-height: 560px;
+  }
+  .person-name { font-size: 1.65rem; }
+  .arabic-bismillah { font-size: 1.45rem; }
+  .front-bismillah-arabic { font-size: 1.85rem; }
+  .gate-bismillah-arabic { font-size: 1.9rem; }
+  .gold-knot-symbol { font-size: 1.8rem; }
+}
+
+@media (max-width: 650px) {
+  :root {
+    --card-width: 330px;
+    --card-height: 520px;
+  }
+  .top-nav {
+    padding: 12px 16px;
+  }
+  .nav-btn .btn-text {
+    display: none;
+  }
+  .nav-btn {
+    padding: 8px 10px;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .person-name { font-size: 1.4rem; }
+  .arabic-bismillah { font-size: 1.3rem; }
+  .front-bismillah-arabic { font-size: 1.6rem; }
+  .gate-bismillah-arabic { font-size: 1.7rem; }
+  .arabic-dua { font-size: 1rem; }
+  .intro-line-1, .intro-line-2 { font-size: 0.72rem; }
+  .card-action-btn { padding: 5px 10px; font-size: 0.7rem; }
+  .ribbon-guest-name { font-size: 1.15rem; }
+  .ribbon-inner { padding: 10px 16px; }
+  .btn-edit-guest { position: static; transform: none; margin-top: 6px; }
+}
+
+@media (max-width: 380px) {
+  :root {
+    --card-width: 295px;
+    --card-height: 480px;
+  }
+  .person-name { font-size: 1.25rem; }
+  .front-bismillah-arabic { font-size: 1.4rem; }
+}
+
+/* ==========================================================================
+   WhatsApp Relative Invite Sender Styles
+   ========================================================================== */
+.nav-btn-wa {
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.25) 0%, rgba(18, 140, 126, 0.4) 100%);
+  border-color: rgba(37, 211, 102, 0.6);
+  color: #c9f7d5;
+}
+
+.nav-btn-wa i {
+  color: #25D366;
+  font-size: 1rem;
+}
+
+.nav-btn-wa:hover {
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.4) 0%, rgba(18, 140, 126, 0.6) 100%);
+  border-color: #25D366;
+  box-shadow: 0 0 16px rgba(37, 211, 102, 0.4);
+}
+
+.fab-wa i {
+  color: #25D366;
+}
+
+.modal-wa-sender {
+  max-width: 620px;
+}
+
+.wa-message-preview-box {
+  background: rgba(4, 28, 20, 0.9);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+
+.preview-header {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #8be5a8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #e0f2e6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid #25D366;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.btn-wa-send {
+  background: linear-gradient(135deg, #128C7E 0%, #25D366 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border: 1px solid #75e89e !important;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35) !important;
+}
+
+.btn-wa-send:hover {
+  background: linear-gradient(135deg, #25D366 0%, #1ebe5d 100%) !important;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.55) !important;
+}
+
+/* Sent Relatives Tracker */
+.sent-relatives-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(223, 183, 108, 0.25);
+}
+
+.sent-relatives-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sent-relatives-header h4 {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: var(--color-gold-champagne);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-clear-history {
+  background: transparent;
+  border: none;
+  color: rgba(223, 183, 108, 0.6);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-clear-history:hover {
+  color: #ff9e9e;
+}
+
+.sent-relatives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.sent-relative-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(3, 28, 21, 0.65);
+  border: 1px solid rgba(223, 183, 108, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+}
+
+.sent-rel-name {
+  font-weight: 600;
+  color: var(--color-gold-bright);
+}
+
+.sent-rel-phone {
+  color: var(--color-gold-light);
+  font-size: 0.75rem;
+}
+
+.sent-rel-time {
+  font-size: 0.7rem;
+  color: rgba(223, 183, 108, 0.6);
+}
+
+.sent-rel-resend {
+  background: transparent;
+  border: 1px solid #25D366;
+  color: #25D366;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.sent-rel-resend:hover {
+  background: #25D366;
+  color: #031c15;
+}
+
+/* ==========================================================================
+   Print Stylesheet
+   ========================================================================== */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .top-nav, #particlesCanvas, .floating-toolbar, .guest-gate-screen, .guest-invitation-ribbon, .modal-backdrop, .front-bismillah-wrapper {
+    display: none !important;
+  }
+  .scene-container {
+    padding: 0;
+  }
+  .card-3d-wrapper {
+    perspective: none;
+    transform: none !important;
+  }
+  .wedding-card-3d {
+    width: 100%;
+    max-width: 600px;
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+  .gate-flap, .wax-seal-wrapper {
+    display: none !important;
+  }
+  .card-center {
+    position: relative;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .person-name, .arabic-bismillah, .gold-knot-symbol {
+    color: #000 !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+  }
+}

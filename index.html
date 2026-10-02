@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedding Invitation | Juveriya & Abdul Hadi</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💍</text></svg>">
+
+  <!-- Google Fonts: Amiri (Arabic), Cinzel Decorative, Great Vibes, Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700;800&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ======================================================== -->
+  <!-- 1. GUEST NAME ENTRY GATE (Displays before invitation)    -->
+  <!-- ======================================================== -->
+  <div class="guest-gate-screen" id="guestGateScreen">
+    <div class="gate-overlay-particles"></div>
+    <div class="guest-gate-card">
+      <div class="gate-gold-border">
+        
+        <!-- Bismillah Header on Gate -->
+        <div class="gate-bismillah-box">
+          <div class="gate-bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+          <div class="gate-bismillah-sub">In the name of Allah, the Beneficent, the Merciful</div>
+        </div>
+
+        <div class="gate-divider-gold">♦ ❖ ♦</div>
+
+        <div class="gate-wedding-badge">Royal Wedding Celebration</div>
+        <h1 class="gate-couple-names">Abdul Hadi &amp; Juveriya</h1>
+
+        <div class="gate-prompt-box">
+          <p class="gate-prompt-text">Kindly enter your name to open your invitation:</p>
+        </div>
+
+        <!-- Name Input Form -->
+        <form id="guestGateForm" class="guest-gate-form">
+          <div class="gate-input-wrapper">
+            <i class="fa-solid fa-user-tag gate-input-icon"></i>
+            <input 
+              type="text" 
+              id="gateGuestNameInput" 
+              class="gate-guest-input" 
+              placeholder="Enter your name (e.g. Mohammed Salman)" 
+              required
+              autocomplete="name"
+              autofocus
+            >
+          </div>
+
+          <div class="gate-checkbox-wrapper">
+            <label class="gate-checkbox-label">
+              <input type="checkbox" id="gateWithFamilyCheck" checked>
+              <span class="custom-check-mark"></span>
+              <span>Include <strong class="gold-text">&ldquo;with Family&rdquo;</strong></span>
+            </label>
+          </div>
+
+          <button type="submit" class="gate-submit-btn" id="btnEnterInvitation">
+            <span>Enter &amp; Open Invitation</span>
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Animated Canvas (Rose Petals & Gold Sparkles) -->
+  <canvas id="particlesCanvas"></canvas>
+
+  <!-- Ambient Audio Player Element -->
+  <audio id="weddingAudio" loop preload="auto"></audio>
+
+  <!-- Navigation / Luxury Header Controls -->
+  <header class="top-nav">
+    <div class="brand-monogram">
+      <span class="monogram-letter">A</span>
+      <span class="monogram-amp">&amp;</span>
+      <span class="monogram-letter">J</span>
+    </div>
+    
+    <div class="nav-controls">
+      <button class="nav-btn" id="btnFoldToggle" title="Open or Fold Invitation Card">
+        <i class="fa-solid fa-door-open"></i> <span class="btn-text">Open Card</span>
+      </button>
+      <button class="nav-btn" id="btnAudioToggle" title="Play / Pause Wedding Melody">
+        <i class="fa-solid fa-music"></i> <span class="btn-text">Music</span>
+      </button>
+      <button class="nav-btn" id="btnPetalsToggle" title="Toggle Falling Petals">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> <span class="btn-text">Petals</span>
+      </button>
+      <button class="nav-btn" id="btnGalleryToggle" title="View 3D Studio Mockup Gallery">
+        <i class="fa-solid fa-camera"></i> <span class="btn-text">3D Photos</span>
+      </button>
+      <button class="nav-btn nav-btn-primary" id="btnCustomizeToggle" title="Customize Card Details">
+        <i class="fa-solid fa-pen-nib"></i> <span class="btn-text">Edit Details</span>
+      </button>
+      <button class="nav-btn nav-btn-wa" id="btnOpenWaSender" title="Send WhatsApp Invitation by Mobile Number">
+        <i class="fa-brands fa-whatsapp"></i> <span class="btn-text">Send Invite</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 3D Card Scene Container -->
+  <main class="scene-container">
+    
+    <!-- ======================================================== -->
+    <!-- 2. PERSONALIZED GUEST INVITATION BANNER                  -->
+    <!-- "You are invited (entered name) + with Family"           -->
+    <!-- ======================================================== -->
+    <div class="guest-invitation-ribbon" id="guestInvitationRibbon">
+      <div class="ribbon-inner">
+        <div class="ribbon-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+        <div class="ribbon-text-line">You are cordially invited:</div>
+        <h2 class="ribbon-guest-name">
+          <span id="displayBannerGuestName">Honored Guest</span>
+          <span class="family-badge" id="displayBannerFamilyTag">with Family</span>
+        </h2>
+        <button class="btn-edit-guest" id="btnEditGuestName" title="Change Guest Name">
+          <i class="fa-solid fa-user-pen"></i> <span>Change</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3D Perspective Wrapper with Interactive Tilt -->
+    <div class="card-3d-wrapper" id="cardWrapper">
+      <div class="wedding-card-3d" id="weddingCard">
+
+        <!-- ======================================================== -->
+        <!-- FRONT EMBOSSED BISMILLAH ARABIC CALLIGRAPHY ARCH         -->
+        <!-- "remove everything just keep Bismillah in Arabic"        -->
+        <!-- ======================================================== -->
+        <div class="front-bismillah-wrapper" id="frontBismillahWrapper">
+          <div class="front-bismillah-card">
+            <div class="front-arch-finial">✦ ❖ ✦</div>
+            <div class="front-bismillah-arabic">
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </div>
+            <div class="front-arch-underline">
+              <span class="gold-vine-left"></span>
+              <span class="gold-vine-center">♦</span>
+              <span class="gold-vine-right"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- CENTER MAIN INVITATION PANEL (Always inside)  -->
+        <!-- ============================================== -->
+        <div class="card-face card-center">
+          <div class="card-foil-sheen"></div>
+          
+          <!-- Ornate Corner Mandalas -->
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <!-- Ornate Inner Golden Border -->
+          <div class="gold-border-frame">
+            
+            <!-- Bismillah Header -->
+            <div class="bismillah-container">
+              <div class="arabic-bismillah" id="displayBismillah">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </div>
+              <p class="bismillah-translation" id="displayBismillahEng">
+                In the name of Allah, the Beneficent, the Merciful
+              </p>
+            </div>
+
+            <!-- Personalized Greeting inside Card -->
+            <div class="card-personalized-guest-box">
+              <span class="guest-cordial-line">Cordially Inviting</span>
+              <h3 class="card-guest-full-name">
+                <span id="displayCardGuestName">Honored Guest</span>
+                <span class="guest-family-suffix" id="displayCardFamilyTag">with Family</span>
+              </h3>
+            </div>
+
+            <!-- Invitation Greeting -->
+            <div class="invitation-intro">
+              <p class="intro-line-1">The pleasure of your gracious presence is requested</p>
+              <p class="intro-line-2">at the auspicious marriage ceremony of</p>
+            </div>
+
+            <!-- Couple Names & Royal Monogram -->
+            <div class="couple-section">
+              <div class="person groom-box">
+                <h2 class="person-name" id="displayGroomName">Abdul Hadi</h2>
+                <p class="parent-info" id="displayGroomParents">
+                  (S/o Mr. Abdul Basith)
+                </p>
+              </div>
+
+              <div class="knot-connector">
+                <span class="gold-knot-symbol">&amp;</span>
+              </div>
+
+              <div class="person bride-box">
+                <h2 class="person-name" id="displayBrideName">Juveriya</h2>
+                <p class="parent-info" id="displayBrideParents">
+                  (D/o Mr. Mohd Jani Miya)
+                </p>
+              </div>
+            </div>
+
+            <!-- Center Divider Ornament -->
+            <div class="gold-divider">
+              <span class="divider-line"></span>
+              <span class="divider-diamond">♦ ❖ ♦</span>
+              <span class="divider-line"></span>
+            </div>
+
+            <!-- Quranic Blessing Quote -->
+            <div class="card-blessing-quote">
+              <p class="quran-quote">
+                &ldquo;And He has placed between you love and compassion&rdquo;
+              </p>
+              <p class="quran-surah">— Surah Ar-Rum [30:21] —</p>
+            </div>
+
+            <!-- Action links in card -->
+            <div class="card-quick-actions">
+              <button class="card-action-btn" id="btnShareWhatsapp">
+                <i class="fa-brands fa-whatsapp"></i> Share on WhatsApp
+              </button>
+              <button class="card-action-btn" id="btnAddToCalendar">
+                <i class="fa-solid fa-calendar-check"></i> Add to Calendar
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- LEFT 3D GATEFOLD FLAP (Hinged at left edge)   -->
+        <!-- Outer face clean: ONLY gold borders & mandala -->
+        <!-- ============================================== -->
+        <div class="gate-flap flap-left" id="flapLeft">
+          
+          <!-- Outer Face (Clean Minimal Emerald Velvet & Gold Mandala) -->
+          <div class="flap-side flap-front">
+            <div class="card-foil-sheen"></div>
+            <div class="flap-outer-content">
+              <div class="side-mandala-ornament left-mandala"></div>
+              <div class="flap-outer-border">
+                <div class="flap-ornate-corner top"></div>
+                <div class="flap-ornate-corner bottom"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inner Face (Revealed when opened: Islamic Dua) -->
+          <div class="flap-side flap-back">
+            <div class="card-foil-sheen"></div>
+            <div class="flap-inner-content">
+              <div class="inner-border-frame">
+                <div class="inner-header-icon">
+                  <i class="fa-solid fa-hands-praying"></i>
+                </div>
+                <h3 class="flap-title">Du'a for the Couple</h3>
+                <div class="arabic-dua">
+                  بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
+                </div>
+                <p class="dua-meaning">
+                  &ldquo;May Allah bless you, shower His blessings upon you, and unite you both in goodness and peace.&rdquo;
+                </p>
+                <div class="decorative-separator">✦ ✦ ✦</div>
+                <div class="family-blessing">
+                  <h4>With Best Compliments:</h4>
+                  <p id="displayFamilyCompliments">
+                    Near &amp; Dear Family, Relatives &amp; Friends
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- RIGHT 3D GATEFOLD FLAP (Hinged at right edge) -->
+        <!-- Outer face clean: ONLY gold borders & mandala -->
+        <!-- ============================================== -->
+        <div class="gate-flap flap-right" id="flapRight">
+          
+          <!-- Outer Face (Clean Minimal Emerald Velvet & Gold Mandala) -->
+          <div class="flap-side flap-front">
+            <div class="card-foil-sheen"></div>
+            <div class="flap-outer-content">
+              <div class="side-mandala-ornament right-mandala"></div>
+              <div class="flap-outer-border">
+                <div class="flap-ornate-corner top"></div>
+                <div class="flap-ornate-corner bottom"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inner Face (Revealed when opened: Barat & Walima) -->
+          <div class="flap-side flap-back">
+            <div class="card-foil-sheen"></div>
+            <div class="flap-inner-content">
+              <div class="inner-border-frame">
+                
+                <!-- Nikah Event Box -->
+                <div class="event-detail-box">
+                  <div class="event-header">
+                    <span class="event-icon"><i class="fa-solid fa-moon"></i></span>
+                    <h3 class="event-title" id="displayBaratTitle">Nikah</h3>
+                  </div>
+                  <div class="event-meta">
+                    <span class="event-date" id="displayBaratDate">On 21st Nov 2025</span>
+                    <span class="event-time" id="displayBaratTime">8:00 PM</span>
+                  </div>
+                  <div class="event-venue">
+                    <strong>Venue:</strong>
+                    <p id="displayBaratVenue">
+                      Falak Convention Hall,<br>Balapur, Telangana.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="event-mini-divider">♦ ❖ ♦</div>
+
+                <!-- Walima Event Box -->
+                <div class="event-detail-box">
+                  <div class="event-header">
+                    <span class="event-icon"><i class="fa-solid fa-star-and-crescent"></i></span>
+                    <h3 class="event-title" id="displayWalimaTitle">Walima</h3>
+                  </div>
+                  <div class="event-meta">
+                    <span class="event-date" id="displayWalimaDate">On 22nd Nov 2025</span>
+                    <span class="event-time" id="displayWalimaTime">8:00 PM onwards</span>
+                  </div>
+                  <div class="event-venue">
+                    <strong>Venue:</strong>
+                    <p id="displayWalimaVenue">
+                      Koh-e-Toor Function Hall,<br>Golconda, Hyderabad.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Contact No -->
+                <div class="rsvp-footer">
+                  <div class="rsvp-title">Contact No</div>
+                  <div class="rsvp-contact" id="displayRsvpContact">
+                    <a href="tel:+919440394950" class="contact-phone-link"><i class="fa-solid fa-phone"></i> +91 94403 94950</a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- ROYAL CENTER GOLDEN WAX SEAL (Opens Card)     -->
+        <!-- ============================================== -->
+        <div class="wax-seal-wrapper" id="waxSealWrapper">
+          <div class="wax-seal" id="waxSeal" title="Tap to Open Card">
+            <div class="seal-inner-emboss">
+              <span class="seal-arabic">بِسْمِ اللهِ</span>
+              <span class="seal-initials">A &amp; J</span>
+              <span class="seal-subtext">2025</span>
+            </div>
+            <div class="seal-glow-ring"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Floating Action Toolbar (Bottom) -->
+    <div class="floating-toolbar">
+      <button class="fab-btn" id="fabToggleFold" title="Toggle 3D Fold">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Toggle Fold</span>
+      </button>
+      <button class="fab-btn" id="fabPrintCard" title="Print / Save PDF">
+        <i class="fa-solid fa-print"></i>
+        <span>Print Card</span>
+      </button>
+      <button class="fab-btn" id="fabDirections" title="Directions / Venue Map">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Venues</span>
+      </button>
+      <button class="fab-btn fab-wa" id="fabSendWa" title="Send WhatsApp Invite by Phone Number">
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>WhatsApp</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: 3D Studio Mockup Photos (High-Res Photorealistic)-->
+  <!-- ======================================================== -->
+  <div class="modal-backdrop" id="galleryModal">
+    <div class="modal-card modal-gallery">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gem"></i> 3D Studio Render Gallery</h3>
+        <button class="modal-close" id="btnCloseGallery">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Photorealistic 3D studio mockups of Juveriya &amp; Abdul Hadi's royal emerald and gold wedding card.
+        </p>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <div class="gallery-badge">3D Open Standing Fold</div>
+            <img src="assets/images/card_3d_open.jpg" alt="3D Open Card Fold" id="galleryImgOpen">
+            <div class="gallery-actions">
+              <a href="assets/images/card_3d_open.jpg" download="Juveriya_AbdulHadi_3D_Open_Card.jpg" class="download-link">
+                <i class="fa-solid fa-download"></i> Download High-Res
+              </a>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-badge">3D Closed View with Wax Seal</div>
+            <img src="assets/images/card_3d_closed.jpg" alt="3D Closed Card with Wax Seal" id="galleryImgClosed">
+            <div class="gallery-actions">
+              <a href="assets/images/card_3d_closed.jpg" download="Juveriya_AbdulHadi_3D_Closed_Seal.jpg" class="download-link">
+                <i class="fa-solid fa-download"></i> Download High-Res
+              </a>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-badge">Original Design Reference</div>
+            <img src="assets/images/reference_card.jpg" alt="Original Reference Card">
+            <div class="gallery-actions">
+              <span class="ref-tag">Original Reference</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: Live Customizer (Edit Names, Dates, Venues)      -->
+  <!-- ======================================================== -->
+  <div class="modal-backdrop" id="customizerModal">
+    <div class="modal-card modal-form">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-fancy"></i> Personalize Wedding Details</h3>
+        <button class="modal-close" id="btnCloseCustomizer">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="cardCustomizerForm">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputGroomName">Groom's Name</label>
+              <input type="text" id="inputGroomName" value="Abdul Hadi" required>
+            </div>
+            <div class="form-group">
+              <label for="inputBrideName">Bride's Name</label>
+              <input type="text" id="inputBrideName" value="Juveriya" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputGroomParents">Groom's Father</label>
+              <input type="text" id="inputGroomParents" value="Mr. Abdul Basith">
+            </div>
+            <div class="form-group">
+              <label for="inputBrideParents">Bride's Father</label>
+              <input type="text" id="inputBrideParents" value="Mr. Mohd Jani Miya">
+            </div>
+          </div>
+
+          <fieldset class="form-fieldset">
+            <legend><i class="fa-solid fa-moon"></i> Event 1: Nikah</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="inputBaratDate">Nikah Date</label>
+                <input type="text" id="inputBaratDate" value="On 21st Nov 2025">
+              </div>
+              <div class="form-group">
+                <label for="inputBaratTime">Nikah Time</label>
+                <input type="text" id="inputBaratTime" value="8:00 pm">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputBaratVenue">Nikah Venue</label>
+              <textarea id="inputBaratVenue" rows="2">Falak Convention Hall, Balapur, Telangana.</textarea>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-fieldset">
+            <legend><i class="fa-solid fa-star-and-crescent"></i> Event 2: Walima</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="inputWalimaDate">Walima Date</label>
+                <input type="text" id="inputWalimaDate" value="On 22nd Nov 2025">
+              </div>
+              <div class="form-group">
+                <label for="inputWalimaTime">Walima Time</label>
+                <input type="text" id="inputWalimaTime" value="8:00 pm onwards">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputWalimaVenue">Walima Venue</label>
+              <textarea id="inputWalimaVenue" rows="2">Koh-e-Toor Function Hall, Golconda, Hyderabad.</textarea>
+            </div>
+          </fieldset>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputRsvpContact">Contact Number</label>
+              <input type="text" id="inputRsvpContact" value="+91 94403 94950">
+            </div>
+            <div class="form-group">
+              <label for="inputFamilyCompliments">Best Compliments From</label>
+              <input type="text" id="inputFamilyCompliments" value="Near & Dear Family, Relatives & Friends">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="btnResetDefaults">Reset Defaults</button>
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save &amp; Update Card</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 3: WhatsApp Relative Invite Sender                -->
+  <!-- ======================================================== -->
+  <div class="modal-backdrop" id="waSenderModal">
+    <div class="modal-card modal-wa-sender">
+      <div class="modal-header">
+        <h3><i class="fa-brands fa-whatsapp"></i> Send WhatsApp Invitation</h3>
+        <button class="modal-close" id="btnCloseWaSender">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Enter your relative's name and mobile number below. When you tap <strong>Send on WhatsApp</strong>, it opens their WhatsApp chat with their personal link so their name is filled in automatically!
+        </p>
+
+        <form id="waSenderForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputWaRelativeName"><i class="fa-solid fa-user"></i> Relative's Name</label>
+              <input type="text" id="inputWaRelativeName" placeholder="e.g. Saniya, Uncle Tariq, Farhan Bhai" required>
+            </div>
+            <div class="form-group">
+              <label for="inputWaMobileNumber"><i class="fa-solid fa-mobile-screen-button"></i> Mobile Number</label>
+              <input type="tel" id="inputWaMobileNumber" placeholder="e.g. 9849012345 (10 digits)" required>
+            </div>
+          </div>
+
+          <div class="gate-checkbox-wrapper" style="justify-content: flex-start; margin: 6px 0 14px;">
+            <label class="gate-checkbox-label">
+              <input type="checkbox" id="checkWaWithFamily" checked>
+              <span class="custom-check-mark"></span>
+              <span>Include <strong class="gold-text">&ldquo;with Family&rdquo;</strong></span>
+            </label>
+          </div>
+
+          <!-- Live WhatsApp Message Preview -->
+          <div class="wa-message-preview-box">
+            <div class="preview-header"><i class="fa-solid fa-eye"></i> WhatsApp Message Preview:</div>
+            <pre class="preview-content" id="waMessagePreviewText"></pre>
+          </div>
+
+          <div class="form-actions" style="margin-top: 14px;">
+            <button type="button" class="btn-secondary" id="btnCopyWaLink">
+              <i class="fa-regular fa-copy"></i> Copy Link
+            </button>
+            <button type="submit" class="btn-primary btn-wa-send" id="btnSubmitWaSend">
+              <i class="fa-brands fa-whatsapp"></i> Open WhatsApp &amp; Send
+            </button>
+          </div>
+        </form>
+
+        <!-- Sent Relatives Tracker -->
+        <div class="sent-relatives-section" id="sentRelativesSection">
+          <div class="sent-relatives-header">
+            <h4><i class="fa-solid fa-clock-rotate-left"></i> Sent Invitations Tracker (<span id="sentCount">0</span>)</h4>
+            <button type="button" class="btn-clear-history" id="btnClearWaHistory">Clear</button>
+          </div>
+          <div class="sent-relatives-list" id="sentRelativesList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Application Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>
