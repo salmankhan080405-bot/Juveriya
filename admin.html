@@ -867,6 +867,9 @@
       font-size: 2rem;
       margin-bottom: 10px;
       display: block;
+      color: rgba(223, 183, 108, 0.35);
+    }
+
     .db-status-badge {
       display: inline-flex;
       align-items: center;
@@ -880,9 +883,265 @@
       font-weight: 600;
       letter-spacing: 0.5px;
     }
+
+    /* ======================================================== */
+    /* ADMIN SECURITY GATEWAY: Lock Screen Styling             */
+    /* ======================================================== */
+    .admin-auth-gateway {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #0d4e3b 0%, #06281e 50%, #02120e 100%);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s ease;
+    }
+
+    .admin-auth-gateway.unlocked {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+
+    .auth-card {
+      background: radial-gradient(circle at 50% 15%, rgba(13, 78, 59, 0.95) 0%, rgba(6, 40, 30, 0.98) 70%, #031c15 100%);
+      border: 1.5px solid var(--color-gold-primary);
+      border-radius: 20px;
+      padding: 36px 28px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(223, 183, 108, 0.25);
+      position: relative;
+    }
+
+    .auth-card.shake {
+      animation: authShake 0.4s ease-in-out;
+    }
+
+    @keyframes authShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .auth-icon-wrap {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(223, 183, 108, 0.15);
+      border: 1.5px solid var(--color-gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: var(--color-gold-bright);
+      box-shadow: 0 0 20px rgba(223, 183, 108, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .auth-icon-wrap.success {
+      background: rgba(37, 211, 102, 0.2);
+      border-color: #25D366;
+      color: #85f2ad;
+      box-shadow: 0 0 25px rgba(37, 211, 102, 0.4);
+    }
+
+    .auth-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-gold-bright);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .auth-desc {
+      font-size: 0.82rem;
+      color: var(--color-gold-champagne);
+      opacity: 0.85;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .auth-input-group {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 14px 44px 14px 16px;
+      background: rgba(3, 28, 21, 0.9);
+      border: 1.5px solid rgba(223, 183, 108, 0.4);
+      border-radius: 10px;
+      color: #ffffff;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .auth-input:focus {
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.35);
+    }
+
+    .auth-input:disabled {
+      background: rgba(3, 28, 21, 0.4);
+      border-color: rgba(255, 107, 107, 0.4);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .auth-eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: rgba(223, 183, 108, 0.7);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .auth-eye-btn:hover {
+      color: var(--color-gold-bright);
+    }
+
+    .auth-feedback {
+      font-size: 0.8rem;
+      min-height: 22px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      color: var(--color-gold-champagne);
+    }
+
+    .auth-feedback.error {
+      color: #ff9e9e;
+    }
+
+    .auth-feedback.locked {
+      color: #ff6b6b;
+      font-weight: 700;
+      background: rgba(255, 107, 107, 0.12);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .auth-feedback.success {
+      color: #85f2ad;
+    }
+
+    .btn-auth-submit {
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #dfb76c 0%, #ffd700 50%, #977014 100%);
+      border: none;
+      border-radius: 25px;
+      color: #031c15;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(223, 183, 108, 0.35);
+      margin-bottom: 16px;
+    }
+
+    .btn-auth-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(255, 215, 0, 0.5);
+    }
+
+    .btn-auth-submit:disabled {
+      background: rgba(223, 183, 108, 0.2);
+      color: rgba(255, 255, 255, 0.4);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .auth-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-gold-champagne);
+      text-decoration: none;
+      font-size: 0.78rem;
+      opacity: 0.75;
+      transition: all 0.2s ease;
+    }
+
+    .auth-back-link:hover {
+      opacity: 1;
+      color: var(--color-gold-bright);
+    }
   </style>
 </head>
 <body>
+
+  <!-- ======================================================== -->
+  <!-- ADMIN SECURITY GATEWAY: Passcode Protection             -->
+  <!-- ======================================================== -->
+  <div class="admin-auth-gateway" id="adminAuthGateway">
+    <div class="auth-card" id="authCard">
+      <div class="auth-icon-wrap" id="authIconWrap">
+        <i class="fa-solid fa-shield-halved" id="authIcon"></i>
+      </div>
+      <h2 class="auth-title">Admin Studio Access</h2>
+      <p class="auth-desc">This invitation studio is password protected. Enter the administrator passcode to proceed.</p>
+
+      <form id="adminAuthForm" autocomplete="off">
+        <div class="auth-input-group">
+          <input 
+            type="password" 
+            id="authPasswordInput" 
+            class="auth-input" 
+            placeholder="Enter admin password..." 
+            required 
+            autocomplete="current-password"
+            autofocus
+          >
+          <button type="button" class="auth-eye-btn" id="btnTogglePasswordView" aria-label="Toggle password view">
+            <i class="fa-regular fa-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+
+        <div class="auth-feedback" id="authFeedback">
+          3 attempts remaining
+        </div>
+
+        <button type="submit" class="btn-auth-submit" id="btnAuthSubmit">
+          <i class="fa-solid fa-key"></i>
+          <span>Unlock Admin Portal</span>
+        </button>
+
+        <a href="index.html" class="auth-back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Back to Live Wedding Invitation</span>
+        </a>
+      </form>
+    </div>
+  </div>
 
   <div class="admin-container">
     
@@ -896,6 +1155,10 @@
         <button type="button" class="admin-nav-btn" id="btnNavHistory">
           <i class="fa-solid fa-clock-rotate-left"></i>
           <span>History (<span class="tracker-count-badge" id="navTrackerCount">0</span>)</span>
+        </button>
+        <button type="button" class="admin-nav-btn" id="btnNavLock" title="Lock Admin Portal">
+          <i class="fa-solid fa-lock"></i>
+          <span>Lock</span>
         </button>
         <a href="index.html" class="admin-nav-link" id="linkBackToCard">
           <span>View Live Invitation</span>
@@ -1589,10 +1852,253 @@
         });
       }
 
+      // ========================================================
+      // Security Gateway: Passcode Protection (Abcd123, 3 attempts, 30s lockout)
+      // ========================================================
+      const ADMIN_PASSCODE = 'Abcd123';
+      const MAX_ATTEMPTS = 3;
+      const LOCKOUT_DURATION_MS = 30000;
+      const AUTH_SESSION_KEY = 'juveriya_admin_auth_verified';
+      const AUTH_ATTEMPTS_KEY = 'juveriya_admin_failed_attempts';
+      const AUTH_LOCKOUT_KEY = 'juveriya_admin_lockout_until';
+
+      const adminAuthGateway = document.getElementById('adminAuthGateway');
+      const authCard = document.getElementById('authCard');
+      const authIconWrap = document.getElementById('authIconWrap');
+      const authIcon = document.getElementById('authIcon');
+      const adminAuthForm = document.getElementById('adminAuthForm');
+      const authPasswordInput = document.getElementById('authPasswordInput');
+      const btnTogglePasswordView = document.getElementById('btnTogglePasswordView');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const authFeedback = document.getElementById('authFeedback');
+      const btnAuthSubmit = document.getElementById('btnAuthSubmit');
+      const btnNavLock = document.getElementById('btnNavLock');
+
+      let lockoutTimerInterval = null;
+
+      function getLockoutRemainingSeconds() {
+        try {
+          const lockoutUntil = parseInt(localStorage.getItem(AUTH_LOCKOUT_KEY) || '0', 10);
+          const now = Date.now();
+          if (lockoutUntil > now) {
+            return Math.ceil((lockoutUntil - now) / 1000);
+          }
+        } catch (e) {}
+        return 0;
+      }
+
+      function getFailedAttempts() {
+        try {
+          return parseInt(localStorage.getItem(AUTH_ATTEMPTS_KEY) || '0', 10);
+        } catch (e) {
+          return 0;
+        }
+      }
+
+      function setFailedAttempts(count) {
+        try {
+          localStorage.setItem(AUTH_ATTEMPTS_KEY, String(count));
+        } catch (e) {}
+      }
+
+      function resetAuthRestrictions() {
+        try {
+          localStorage.removeItem(AUTH_ATTEMPTS_KEY);
+          localStorage.removeItem(AUTH_LOCKOUT_KEY);
+        } catch (e) {}
+        if (lockoutTimerInterval) {
+          clearInterval(lockoutTimerInterval);
+          lockoutTimerInterval = null;
+        }
+      }
+
+      function startLockoutTimer(initialSeconds) {
+        if (lockoutTimerInterval) clearInterval(lockoutTimerInterval);
+
+        if (authPasswordInput) {
+          authPasswordInput.disabled = true;
+          authPasswordInput.value = '';
+        }
+        if (btnAuthSubmit) btnAuthSubmit.disabled = true;
+
+        function tick() {
+          const remaining = getLockoutRemainingSeconds();
+          if (remaining > 0) {
+            if (authFeedback) {
+              authFeedback.className = 'auth-feedback locked';
+              authFeedback.innerHTML = `<i class="fa-solid fa-lock"></i> Locked! Try again in <strong>${remaining}s</strong>`;
+            }
+          } else {
+            clearInterval(lockoutTimerInterval);
+            lockoutTimerInterval = null;
+            resetAuthRestrictions();
+            if (authPasswordInput) {
+              authPasswordInput.disabled = false;
+              authPasswordInput.value = '';
+              authPasswordInput.focus();
+            }
+            if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+            if (authFeedback) {
+              authFeedback.className = 'auth-feedback';
+              authFeedback.textContent = 'Lock expired. 3 attempts remaining';
+            }
+          }
+        }
+
+        tick();
+        lockoutTimerInterval = setInterval(tick, 1000);
+      }
+
+      function unlockPortal(animate = true) {
+        sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
+        resetAuthRestrictions();
+
+        if (authIconWrap) authIconWrap.classList.add('success');
+        if (authIcon) authIcon.className = 'fa-solid fa-lock-open';
+        if (authFeedback) {
+          authFeedback.className = 'auth-feedback success';
+          authFeedback.innerHTML = '<i class="fa-solid fa-check"></i> Access Granted! Welcome to Admin Studio.';
+        }
+
+        setTimeout(() => {
+          if (adminAuthGateway) {
+            adminAuthGateway.classList.add('unlocked');
+          }
+          if (relativeNameInput) {
+            relativeNameInput.focus();
+          }
+        }, animate ? 350 : 0);
+      }
+
+      function lockPortal() {
+        sessionStorage.removeItem(AUTH_SESSION_KEY);
+        if (adminAuthGateway) {
+          adminAuthGateway.classList.remove('unlocked');
+        }
+        if (authIconWrap) authIconWrap.classList.remove('success');
+        if (authIcon) authIcon.className = 'fa-solid fa-shield-halved';
+        if (authPasswordInput) {
+          authPasswordInput.value = '';
+          authPasswordInput.type = 'password';
+        }
+        if (eyeIcon) eyeIcon.className = 'fa-regular fa-eye';
+
+        const remainingLock = getLockoutRemainingSeconds();
+        if (remainingLock > 0) {
+          startLockoutTimer(remainingLock);
+        } else {
+          const failed = getFailedAttempts();
+          const attemptsLeft = Math.max(0, MAX_ATTEMPTS - failed);
+          if (authFeedback) {
+            authFeedback.className = 'auth-feedback';
+            authFeedback.textContent = failed > 0 ? `${attemptsLeft} attempt${attemptsLeft === 1 ? '' : 's'} remaining` : '3 attempts remaining';
+          }
+          if (authPasswordInput) {
+            authPasswordInput.disabled = false;
+            setTimeout(() => authPasswordInput.focus(), 200);
+          }
+          if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+        }
+      }
+
+      function initSecurityGateway() {
+        const remainingLock = getLockoutRemainingSeconds();
+        if (remainingLock > 0) {
+          if (adminAuthGateway) adminAuthGateway.classList.remove('unlocked');
+          startLockoutTimer(remainingLock);
+          return;
+        }
+
+        const isVerified = sessionStorage.getItem(AUTH_SESSION_KEY) === 'true';
+        if (isVerified) {
+          if (adminAuthGateway) adminAuthGateway.classList.add('unlocked');
+        } else {
+          if (adminAuthGateway) adminAuthGateway.classList.remove('unlocked');
+          const failed = getFailedAttempts();
+          const attemptsLeft = Math.max(0, MAX_ATTEMPTS - failed);
+          if (authFeedback) {
+            authFeedback.className = 'auth-feedback';
+            authFeedback.textContent = (failed > 0 && attemptsLeft > 0)
+              ? `${attemptsLeft} chance${attemptsLeft === 1 ? '' : 's'} remaining`
+              : '3 attempts remaining';
+          }
+          setTimeout(() => {
+            if (authPasswordInput) authPasswordInput.focus();
+          }, 150);
+        }
+      }
+
+      // Password Form Submission
+      if (adminAuthForm) {
+        adminAuthForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          const remainingLock = getLockoutRemainingSeconds();
+          if (remainingLock > 0) {
+            startLockoutTimer(remainingLock);
+            return;
+          }
+
+          const entered = (authPasswordInput ? authPasswordInput.value : '').trim();
+
+          if (entered === ADMIN_PASSCODE) {
+            unlockPortal(true);
+          } else {
+            let failed = getFailedAttempts() + 1;
+            setFailedAttempts(failed);
+
+            if (authCard) {
+              authCard.classList.remove('shake');
+              void authCard.offsetWidth; // trigger reflow
+              authCard.classList.add('shake');
+            }
+
+            if (authPasswordInput) {
+              authPasswordInput.value = '';
+              authPasswordInput.focus();
+            }
+
+            if (failed >= MAX_ATTEMPTS) {
+              try {
+                localStorage.setItem(AUTH_LOCKOUT_KEY, String(Date.now() + LOCKOUT_DURATION_MS));
+              } catch (err) {}
+              startLockoutTimer(30);
+            } else {
+              const chancesLeft = MAX_ATTEMPTS - failed;
+              if (authFeedback) {
+                authFeedback.className = 'auth-feedback error';
+                authFeedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Incorrect password! <strong>${chancesLeft}</strong> chance${chancesLeft === 1 ? '' : 's'} remaining.`;
+              }
+            }
+          }
+        });
+      }
+
+      // Eye Icon View Toggle
+      if (btnTogglePasswordView && authPasswordInput && eyeIcon) {
+        btnTogglePasswordView.addEventListener('click', () => {
+          if (authPasswordInput.type === 'password') {
+            authPasswordInput.type = 'text';
+            eyeIcon.className = 'fa-regular fa-eye-slash';
+          } else {
+            authPasswordInput.type = 'password';
+            eyeIcon.className = 'fa-regular fa-eye';
+          }
+        });
+      }
+
+      // Nav Lock Button
+      if (btnNavLock) {
+        btnNavLock.addEventListener('click', () => {
+          lockPortal();
+        });
+      }
+
       // Initial setup
       updatePreview();
       updateCounters();
       db.checkStatus();
+      initSecurityGateway();
 
     })();
   </script>
