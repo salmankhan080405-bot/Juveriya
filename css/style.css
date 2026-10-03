@@ -24,8 +24,8 @@
   --font-sans: 'Montserrat', sans-serif;
   
   --card-width: 440px;
-  --card-closed-height: 440px;
-  --card-open-height: 640px;
+  --card-closed-height: 620px;
+  --card-open-height: 660px;
   --card-height: var(--card-closed-height);
   --card-scale: 1;
   --shadow-elevation: 0 25px 60px rgba(0, 0, 0, 0.75), 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -1971,8 +1971,8 @@ body {
 @media (max-width: 900px) {
   :root {
     --card-width: 380px;
-    --card-closed-height: 380px;
-    --card-open-height: 560px;
+    --card-closed-height: 540px;
+    --card-open-height: 580px;
     --card-height: var(--card-closed-height);
   }
   .person-name { font-size: 1.65rem; }
@@ -1985,8 +1985,8 @@ body {
 @media (max-width: 650px) {
   :root {
     --card-width: 330px;
-    --card-closed-height: 330px;
-    --card-open-height: 520px;
+    --card-closed-height: 480px;
+    --card-open-height: 540px;
     --card-height: var(--card-closed-height);
   }
   .top-nav {
@@ -2017,8 +2017,8 @@ body {
 @media (max-width: 380px) {
   :root {
     --card-width: 295px;
-    --card-closed-height: 295px;
-    --card-open-height: 480px;
+    --card-closed-height: 440px;
+    --card-open-height: 500px;
     --card-height: var(--card-closed-height);
   }
   .person-name { font-size: 1.25rem; }

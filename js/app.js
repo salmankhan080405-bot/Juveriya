@@ -584,11 +584,11 @@
       weddingCard.classList.contains('step-2-diagonal') ||
       weddingCard.classList.contains('step-3-vertical')
     );
-    // Closed square card is 440px wide. Open card has 2 flaps unfolded (total width 880px).
+    // Closed card is 440px wide x 620px high. Open card has 2 flaps unfolded (total width 880px x 660px high).
     const targetWidth = isCardOpen ? 900 : 460;
-    const targetHeight = isCardOpen ? 680 : 480;
+    const targetHeight = isCardOpen ? 700 : 640;
     const availWidth = Math.max(300, window.innerWidth - 24);
-    const availHeight = Math.max(400, window.innerHeight - 120);
+    const availHeight = Math.max(400, window.innerHeight - 80);
     const scaleW = availWidth / targetWidth;
     const scaleH = availHeight / targetHeight;
     currentScale = Math.min(1, scaleW, scaleH);
