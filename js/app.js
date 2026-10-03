@@ -401,6 +401,71 @@
     }
   }
 
+  // Royal Wax Seal Fracture Snap & Golden Shimmer Burst Sound
+  function playWaxCrackSound() {
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+
+      // 1. Sharp tactile wax fracture / crack snap impulse
+      const crackBufferSize = Math.floor(ctx.sampleRate * 0.12);
+      const crackBuffer = ctx.createBuffer(1, crackBufferSize, ctx.sampleRate);
+      const crackData = crackBuffer.getChannelData(0);
+      for (let i = 0; i < crackBufferSize; i++) {
+        crackData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.015));
+      }
+      const crackNoise = ctx.createBufferSource();
+      crackNoise.buffer = crackBuffer;
+      const crackFilter = ctx.createBiquadFilter();
+      crackFilter.type = 'highpass';
+      crackFilter.frequency.setValueAtTime(1400, now);
+
+      const crackGain = ctx.createGain();
+      crackGain.gain.setValueAtTime(0.35, now);
+      crackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+      crackNoise.connect(crackFilter);
+      crackFilter.connect(crackGain);
+      crackGain.connect(ctx.destination);
+      crackNoise.start(now);
+
+      // 2. Resonant body pop / seal break thud
+      const snapOsc = ctx.createOscillator();
+      const snapGain = ctx.createGain();
+      snapOsc.type = 'triangle';
+      snapOsc.frequency.setValueAtTime(260, now);
+      snapOsc.frequency.exponentialRampToValueAtTime(65, now + 0.14);
+
+      snapGain.gain.setValueAtTime(0.28, now);
+      snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+      snapOsc.connect(snapGain);
+      snapGain.connect(ctx.destination);
+      snapOsc.start(now);
+      snapOsc.stop(now + 0.15);
+
+      // 3. Radiant Golden Light Burst Sparkle Chimes
+      const burstFrequencies = [1046.5, 1318.51, 1567.98, 2093.0]; // C6, E6, G6, C7 royal octave flourish
+      burstFrequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + 0.05 + idx * 0.06);
+
+        gain.gain.setValueAtTime(0.0001, now + 0.05 + idx * 0.06);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.05 + idx * 0.06 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05 + idx * 0.06 + 0.7);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + 0.05 + idx * 0.06);
+        osc.stop(now + 0.05 + idx * 0.06 + 0.75);
+      });
+    } catch (e) {
+      console.warn('Audio not available:', e);
+    }
+  }
+
   // Step 2: Diagonal Unfolding Sparkle Chime Sound
   function playDiagonalChimeSound() {
     try {
@@ -634,6 +699,7 @@
     updateCardScale();
 
     try {
+      playWaxCrackSound();
       playUnfoldSound();
     } catch (err) {}
 
