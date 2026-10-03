@@ -1278,8 +1278,8 @@
         baseUrl = window.location.origin + window.location.pathname;
       }
       const inviteUrl = withFamily 
-        ? `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=true` 
-        : `${baseUrl}?name=${encodeURIComponent(cleanName)}`;
+        ? `${baseUrl}?name=${encodeURIComponent(cleanName)}&family=true&v=21` 
+        : `${baseUrl}?name=${encodeURIComponent(cleanName)}&v=21`;
 
       const message = 
         `Dear ${greeting},\n` +

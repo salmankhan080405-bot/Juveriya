@@ -1366,16 +1366,22 @@ body {
   justify-content: center;
   overflow: hidden;
   will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   transition: transform 0.3s ease;
 }
 
 /* Left Half Jigsaw/Fracture Clip Path */
 .seal-half-left {
+  -webkit-clip-path: polygon(0% 0%, 50% 0%, 48% 25%, 52% 45%, 48% 65%, 51.5% 85%, 50% 100%, 0% 100%);
   clip-path: polygon(0% 0%, 50% 0%, 48% 25%, 52% 45%, 48% 65%, 51.5% 85%, 50% 100%, 0% 100%);
 }
 
 /* Right Half Jigsaw/Fracture Clip Path */
 .seal-half-right {
+  -webkit-clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 51.5% 85%, 48% 65%, 52% 45%, 48% 25%);
   clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 51.5% 85%, 48% 65%, 52% 45%, 48% 25%);
 }
 
@@ -2135,9 +2141,9 @@ body {
    ========================================================================== */
 @media (max-width: 900px) {
   :root {
-    --card-width: 380px;
-    --card-closed-height: 540px;
-    --card-open-height: 580px;
+    --card-width: 400px;
+    --card-closed-height: 600px;
+    --card-open-height: 640px;
     --card-height: var(--card-closed-height);
   }
   .person-name { font-size: 1.65rem; }
@@ -2149,9 +2155,9 @@ body {
 
 @media (max-width: 650px) {
   :root {
-    --card-width: 330px;
-    --card-closed-height: 480px;
-    --card-open-height: 540px;
+    --card-width: 360px;
+    --card-closed-height: 580px;
+    --card-open-height: 620px;
     --card-height: var(--card-closed-height);
   }
   .top-nav {
@@ -2181,9 +2187,9 @@ body {
 
 @media (max-width: 380px) {
   :root {
-    --card-width: 295px;
-    --card-closed-height: 440px;
-    --card-open-height: 500px;
+    --card-width: 320px;
+    --card-closed-height: 540px;
+    --card-open-height: 580px;
     --card-height: var(--card-closed-height);
   }
   .person-name { font-size: 1.25rem; }

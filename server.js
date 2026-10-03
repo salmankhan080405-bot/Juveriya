@@ -12,7 +12,13 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Bypass-Tunnel-Reminder', 'bypass-tunnel-reminder']
 }));
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
 // MySQL Database Configuration
 const DB_CONFIG = {
