@@ -155,16 +155,108 @@
     // Always display this welcome gate screen as the main webpage on load/refresh
     guestGateScreen.classList.remove('is-hidden');
 
-    // Wire the Open button for the fixed relative view
+    // Trigger 2-second visual progress fill on gate button
+    const gateProgress = document.getElementById('gateEnterProgress');
+    if (gateProgress) {
+      gateProgress.style.animation = 'none';
+      void gateProgress.offsetWidth;
+      gateProgress.style.animation = 'autoAdvanceFill 2s linear forwards';
+    }
+
+    // Screen 1: Display for exactly 2 seconds and automatically move forward
+    if (gateAutoAdvanceTimer) clearTimeout(gateAutoAdvanceTimer);
+    gateAutoAdvanceTimer = setTimeout(() => {
+      advanceFromGate();
+    }, 2000);
+
+    // Wire the Open button for the fixed relative view (tapping advances immediately)
     if (btnEnterInvitation) {
-      btnEnterInvitation.onclick = function () {
-        guestGateScreen.classList.add('is-hidden');
+      btnEnterInvitation.onclick = function (e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        advanceFromGate();
+      };
+    }
+
+    // Tapping on the gate card advances immediately
+    const gateCard = document.querySelector('.guest-gate-card');
+    if (gateCard) {
+      gateCard.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'gateGuestNameInput') return;
+        advanceFromGate();
+      });
+    }
+  }
+
+  // =========================================================================
+  // 2-Second Automatic Slide Progression Timers
+  // Screen 1 (Gate): 2 seconds -> Screen 2 (Closed Card): 2 seconds -> Screen 3 (Opened Card): No Limit!
+  // =========================================================================
+  let gateAutoAdvanceTimer = null;
+  let cardAutoOpenTimer = null;
+  let audioUnlocked = false;
+
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    try {
+      const ctx = getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      if (!isAudioPlaying) {
+        startAmbientMelody();
+      }
+    } catch (e) {}
+  }
+
+  window.addEventListener('click', unlockAudio, { passive: true });
+  window.addEventListener('touchstart', unlockAudio, { passive: true });
+
+  function advanceFromGate() {
+    if (gateAutoAdvanceTimer) {
+      clearTimeout(gateAutoAdvanceTimer);
+      gateAutoAdvanceTimer = null;
+    }
+
+    if (!guestGateScreen.classList.contains('is-hidden')) {
+      guestGateScreen.classList.add('is-hidden');
+      try {
         playUnfoldSound();
+      } catch (err) {}
+
+      try {
         if (!isAudioPlaying) {
           startAmbientMelody();
         }
-      };
+      } catch (err) {}
     }
+
+    // Screen 2: Closed 3D Card Cover displays for 2 seconds then auto-opens!
+    startCardAutoOpenTimer();
+  }
+
+  function startCardAutoOpenTimer() {
+    if (cardAutoOpenTimer) {
+      clearTimeout(cardAutoOpenTimer);
+      cardAutoOpenTimer = null;
+    }
+
+    if (isOpen) return;
+
+    // Trigger visual progress animation on card tap button
+    const cardProgress = document.getElementById('cardTapProgress');
+    if (cardProgress) {
+      cardProgress.style.animation = 'none';
+      void cardProgress.offsetWidth;
+      cardProgress.style.animation = 'autoAdvanceFill 2s linear forwards';
+    }
+
+    // Automatically unfold card into Screen 3 after 2 seconds
+    cardAutoOpenTimer = setTimeout(() => {
+      if (!isOpen) {
+        openCard();
+      }
+    }, 2000);
   }
 
   function setGuestInformation(name, withFamily) {
@@ -190,20 +282,12 @@
   }
 
   function handleGateSubmit(e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const gateInput = document.getElementById('gateGuestNameInput');
     const enteredName = gateInput ? gateInput.value.trim() : '';
 
-    if (!enteredName) return;
-
-    setGuestInformation(enteredName, true);
-
-    guestGateScreen.classList.add('is-hidden');
-    playUnfoldSound();
-
-    if (!isAudioPlaying) {
-      startAmbientMelody();
-    }
+    setGuestInformation(enteredName || 'Honored Guest', true);
+    advanceFromGate();
   }
 
   function reopenGuestGate() {
@@ -366,6 +450,11 @@
     if (e && e.stopPropagation) {
       e.stopPropagation();
     }
+    // Cancel any pending auto-open timer when card is opened
+    if (cardAutoOpenTimer) {
+      clearTimeout(cardAutoOpenTimer);
+      cardAutoOpenTimer = null;
+    }
     if (isOpen) return;
     isOpen = true;
     lastCardActionTime = Date.now();
@@ -385,6 +474,7 @@
     } catch (err) {
       console.warn('Audio melody error:', err);
     }
+    // "for last page no limit" -> Stays open indefinitely with all details visible
   }
 
   function closeCard(e) {

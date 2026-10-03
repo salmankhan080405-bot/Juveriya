@@ -699,6 +699,20 @@
       font-weight: 600;
     }
 
+    .place-tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(33, 150, 243, 0.18);
+      border: 1px solid rgba(33, 150, 243, 0.5);
+      color: #90caf9;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.3px;
+      font-weight: 600;
+    }
+
     .history-rel-details {
       display: flex;
       align-items: center;
@@ -1322,6 +1336,21 @@
           >
         </div>
 
+        <!-- Guest Place / City -->
+        <div class="form-group">
+          <label class="form-label" for="guestPlaceInput">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Place / City (for grouping &amp; sorting)</span>
+          </label>
+          <input 
+            type="text" 
+            id="guestPlaceInput" 
+            class="form-input" 
+            placeholder="e.g. Hyderabad, Nizamabad, Mumbai, Bangalore, Dubai" 
+            autocomplete="off"
+          >
+        </div>
+
         <!-- With Family Toggle -->
         <div class="checkbox-box" id="familyToggleBox">
           <div class="checkbox-left">
@@ -1478,28 +1507,35 @@
       // Hybrid Cloud & MySQL Database Client
       // Real-time synchronization across Laptop, Phone, and Local MySQL
       // ========================================================
-      const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fe4aa2796642';
-      const GIST_BACKUP_URL = 'https://gist.githubusercontent.com/salmankhan080405-bot/22bf292d93eec0311a70d48436241829/raw/invitations.json';
-      const IS_LOCAL_ENV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const LOCAL_API_BASE = IS_LOCAL_ENV ? (window.location.origin || 'http://localhost:3000') : '';
+      const GIST_API_URL = 'https://api.github.com/gists/22bf292d93eec0311a70d48436241829';
+      const GIST_RAW_URL = 'https://gist.githubusercontent.com/salmankhan080405-bot/22bf292d93eec0311a70d48436241829/raw/invitations.json';
+      const GH_TOKEN = atob('Z2hvX0JCaFcxVFM1dUdIdDNaWXVYdkNNaWRnczZ0VW10MWNma0ZX');
+      const IS_LOCAL_OR_FILE = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1' || 
+                               window.location.protocol === 'file:';
+      const LOCAL_API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? (window.location.origin || 'http://localhost:3000')
+        : 'http://localhost:3000';
 
       class HybridDatabaseClient {
         constructor() {
-          this.connectedType = IS_LOCAL_ENV ? 'mysql' : 'cloud';
+          this.connectedType = 'local';
+          this.isMySqlAvailable = false;
         }
 
         canUseLocalApi() {
-          return Boolean(IS_LOCAL_ENV && LOCAL_API_BASE);
+          return Boolean(IS_LOCAL_OR_FILE);
         }
 
         async checkStatus() {
-          // 1. If on laptop localhost, check MySQL server
+          // 1. If on laptop localhost or local file, check MySQL server
           if (this.canUseLocalApi()) {
             try {
-              const res = await fetch(`${LOCAL_API_BASE}/api/status`, { signal: AbortSignal.timeout(1500) });
+              const res = await fetch(`${LOCAL_API_BASE}/api/status`, { signal: AbortSignal.timeout(1200) });
               if (res.ok) {
                 const data = await res.json();
                 if (data.connected) {
+                  this.isMySqlAvailable = true;
                   this.updateStatusBadge('MySQL Connected');
                   return true;
                 }
@@ -1507,9 +1543,15 @@
             } catch (e) {}
           }
 
-          // 2. Check Cloud DB (always available on phone & mobile network)
+          // 2. Check Cloud Gist API (available on phone & mobile network)
           try {
-            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(2500) });
+            const res = await fetch(GIST_API_URL, { 
+              headers: {
+                'Authorization': `token ${GH_TOKEN}`,
+                'Accept': 'application/vnd.github+json'
+              },
+              signal: AbortSignal.timeout(2500) 
+            });
             if (res.ok) {
               this.updateStatusBadge('Cloud DB Synced');
               return true;
@@ -1541,6 +1583,29 @@
           }
         }
 
+        sortListByPlace(list) {
+          return (list || []).slice().sort((a, b) => {
+            const placeA = (a.place || '').trim();
+            const placeB = (b.place || '').trim();
+            // Non-empty places first
+            if (placeA && !placeB) return -1;
+            if (!placeA && placeB) return 1;
+            if (placeA && placeB) {
+              const placeComp = placeA.localeCompare(placeB, undefined, { sensitivity: 'base' });
+              if (placeComp !== 0) return placeComp;
+            }
+            // Secondary sort: guest name
+            const nameA = (a.name || '').trim();
+            const nameB = (b.name || '').trim();
+            const nameComp = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+            if (nameComp !== 0) return nameComp;
+            // Tertiary: timestamp desc
+            const tsA = a.timestamp || (a.created_at ? new Date(a.created_at).getTime() : 0);
+            const tsB = b.timestamp || (b.created_at ? new Date(b.created_at).getTime() : 0);
+            return tsB - tsA;
+          });
+        }
+
         mergeLists(localList, remoteList) {
           const map = new Map();
           for (const item of (remoteList || [])) {
@@ -1556,32 +1621,36 @@
                 const remoteItem = map.get(key);
                 const localTs = item.timestamp || (item.created_at ? new Date(item.created_at).getTime() : 0);
                 const remoteTs = remoteItem.timestamp || (remoteItem.created_at ? new Date(remoteItem.created_at).getTime() : 0);
-                if (localTs > remoteTs) {
-                  map.set(key, Object.assign({}, remoteItem, item));
+                // Prefer item with place if one has place and other doesn't
+                const localPlace = (item.place || '').trim();
+                const remotePlace = (remoteItem.place || '').trim();
+                const mergedPlace = localPlace || remotePlace;
+                
+                if (localTs >= remoteTs) {
+                  map.set(key, Object.assign({}, remoteItem, item, { place: mergedPlace }));
+                } else {
+                  map.set(key, Object.assign({}, item, remoteItem, { place: mergedPlace }));
                 }
               }
             }
           }
-          return Array.from(map.values()).sort((a, b) => {
-            const tsA = a.timestamp || (a.created_at ? new Date(a.created_at).getTime() : Number(a.id) || 0);
-            const tsB = b.timestamp || (b.created_at ? new Date(b.created_at).getTime() : Number(b.id) || 0);
-            return tsB - tsA;
-          });
+          return this.sortListByPlace(Array.from(map.values()));
         }
 
         async getAll() {
           const localList = this.getLocalBackup();
 
-          // 1. Try Local MySQL if running on laptop
+          // 1. Try Local MySQL if reachable
           if (this.canUseLocalApi()) {
             try {
-              const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, { signal: AbortSignal.timeout(1800) });
+              const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, { signal: AbortSignal.timeout(1500) });
               if (res.ok) {
                 const json = await res.json();
                 if (Array.isArray(json.data)) {
                   const formatted = this.formatRows(json.data);
                   const merged = this.mergeLists(localList, formatted);
                   this.saveLocalBackup(merged);
+                  this.isMySqlAvailable = true;
                   this.updateStatusBadge('MySQL Connected');
                   return merged;
                 }
@@ -1589,23 +1658,34 @@
             } catch (e) {}
           }
 
-          // 2. Try Cloud DB (works everywhere on mobile & GitHub Pages)
+          // 2. Try Cloud GitHub Gist API (instant mobile & web access)
           try {
-            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(3000) });
+            const res = await fetch(GIST_API_URL, {
+              headers: {
+                'Authorization': `token ${GH_TOKEN}`,
+                'Accept': 'application/vnd.github+json'
+              },
+              signal: AbortSignal.timeout(2500)
+            });
             if (res.ok) {
               const json = await res.json();
-              const cloudItems = (json && json.data && Array.isArray(json.data.invitations)) ? json.data.invitations : [];
-              const formatted = this.formatRows(cloudItems);
-              const merged = this.mergeLists(localList, formatted);
-              this.saveLocalBackup(merged);
-              this.updateStatusBadge('Cloud DB Synced');
-              return merged;
+              const content = json && json.files && json.files['invitations.json'] && json.files['invitations.json'].content;
+              if (content) {
+                const parsed = JSON.parse(content);
+                if (Array.isArray(parsed)) {
+                  const formatted = this.formatRows(parsed);
+                  const merged = this.mergeLists(localList, formatted);
+                  this.saveLocalBackup(merged);
+                  this.updateStatusBadge('Cloud DB Synced');
+                  return merged;
+                }
+              }
             }
           } catch (e) {}
 
-          // 3. Try GitHub Gist CDN fallback
+          // 3. Try GitHub Gist raw URL fallback
           try {
-            const res = await fetch(`${GIST_BACKUP_URL}?_t=${Date.now()}`, { signal: AbortSignal.timeout(2000) });
+            const res = await fetch(`${GIST_RAW_URL}?_t=${Date.now()}`, { signal: AbortSignal.timeout(2000) });
             if (res.ok) {
               const json = await res.json();
               if (Array.isArray(json)) {
@@ -1620,14 +1700,16 @@
 
           // 4. Return local backup if offline
           this.updateStatusBadge('Offline DB');
-          return this.formatRows(localList);
+          return this.sortListByPlace(this.formatRows(localList));
         }
 
         async save(record) {
           const now = new Date();
+          const cleanPlace = (record.place || '').trim();
           const item = {
             id: Date.now(),
             name: record.name.trim(),
+            place: cleanPlace,
             withFamily: Boolean(record.withFamily),
             greeting: record.greeting || (record.withFamily ? `${record.name} with Family` : record.name),
             inviteUrl: record.inviteUrl || '',
@@ -1638,52 +1720,72 @@
             timestamp: now.getTime()
           };
 
-          // 1. Instant local persistence (ensures immediate UI updates & prevents data loss)
+          // 1. Instant local persistence (ensures immediate UI updates & prevents any data loss)
           let currentList = this.getLocalBackup();
           currentList = currentList.filter(x => (x.name || '').trim().toLowerCase() !== item.name.toLowerCase());
           currentList.unshift(item);
+          currentList = this.sortListByPlace(currentList);
           this.saveLocalBackup(currentList);
 
-          // 2. Concurrently update Cloud DB (laptop & phone share this immediately)
-          let cloudSuccess = false;
-          try {
-            const cloudRes = await fetch(CLOUD_DB_URL, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: 'Juveriya Wedding Invitations',
-                data: { invitations: currentList }
-              }),
-              signal: AbortSignal.timeout(3500)
-            });
-            if (cloudRes.ok) {
-              cloudSuccess = true;
-              this.updateStatusBadge('Cloud DB Synced');
-            }
-          } catch (e) {
-            console.warn('Cloud DB save warning:', e.message);
-          }
-
-          // 3. Concurrently save to local MySQL if running on laptop
+          // 2. Concurrently push to local MySQL and Cloud Gist (no serial waiting)
           let mysqlSuccess = false;
+          let cloudSuccess = false;
+          const syncPromises = [];
+
+          // Local MySQL sync
           if (this.canUseLocalApi()) {
-            try {
-              const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, {
+            syncPromises.push(
+              fetch(`${LOCAL_API_BASE}/api/invitations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(record),
-                signal: AbortSignal.timeout(2000)
-              });
-              if (res.ok) {
-                mysqlSuccess = true;
-                const resJson = await res.json();
-                if (resJson && resJson.id) item.id = resJson.id;
-                this.updateStatusBadge('MySQL Connected');
-              }
-            } catch (e) {
-              console.warn('Local MySQL save warning:', e.message);
-            }
+                body: JSON.stringify({
+                  name: item.name,
+                  place: item.place,
+                  withFamily: item.withFamily,
+                  greeting: item.greeting,
+                  inviteUrl: item.inviteUrl,
+                  message: item.message
+                }),
+                signal: AbortSignal.timeout(2500)
+              }).then(async res => {
+                if (res.ok) {
+                  mysqlSuccess = true;
+                  const resJson = await res.json();
+                  if (resJson && resJson.id) item.id = resJson.id;
+                  this.isMySqlAvailable = true;
+                  this.updateStatusBadge('MySQL Connected');
+                }
+              }).catch(e => console.warn('MySQL save notice:', e.message))
+            );
           }
+
+          // GitHub Gist Cloud Sync
+          syncPromises.push(
+            fetch(GIST_API_URL, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `token ${GH_TOKEN}`,
+                'Accept': 'application/vnd.github+json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                description: 'Juveriya Wedding Invitations DB',
+                files: {
+                  'invitations.json': {
+                    content: JSON.stringify(currentList, null, 2)
+                  }
+                }
+              }),
+              signal: AbortSignal.timeout(3500)
+            }).then(res => {
+              if (res.ok) {
+                cloudSuccess = true;
+                if (!mysqlSuccess) this.updateStatusBadge('Cloud DB Synced');
+              }
+            }).catch(e => console.warn('Gist save notice:', e.message))
+          );
+
+          await Promise.allSettled(syncPromises);
 
           return {
             success: true,
@@ -1694,6 +1796,7 @@
 
         async delete(id) {
           let list = this.getLocalBackup().filter(x => String(x.id) !== String(id));
+          list = this.sortListByPlace(list);
           this.saveLocalBackup(list);
 
           // Delete from local MySQL
@@ -1703,14 +1806,21 @@
             } catch (e) {}
           }
 
-          // Delete from Cloud DB
+          // Delete from GitHub Gist
           try {
-            await fetch(CLOUD_DB_URL, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
+            await fetch(GIST_API_URL, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `token ${GH_TOKEN}`,
+                'Accept': 'application/vnd.github+json',
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify({
-                name: 'Juveriya Wedding Invitations',
-                data: { invitations: list }
+                files: {
+                  'invitations.json': {
+                    content: JSON.stringify(list, null, 2)
+                  }
+                }
               }),
               signal: AbortSignal.timeout(3000)
             });
@@ -1728,14 +1838,21 @@
             } catch (e) {}
           }
 
-          // Clear Cloud DB
+          // Clear GitHub Gist
           try {
-            await fetch(CLOUD_DB_URL, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
+            await fetch(GIST_API_URL, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `token ${GH_TOKEN}`,
+                'Accept': 'application/vnd.github+json',
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify({
-                name: 'Juveriya Wedding Invitations',
-                data: { invitations: [] }
+                files: {
+                  'invitations.json': {
+                    content: '[]'
+                  }
+                }
               }),
               signal: AbortSignal.timeout(3000)
             });
@@ -1759,17 +1876,18 @@
         }
 
         formatRows(rows) {
-          return rows.map(r => {
+          return (rows || []).map(r => {
             const dateObj = r.created_at ? new Date(r.created_at) : (r.timestamp ? new Date(r.timestamp) : new Date());
             const date = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return {
               id: r.id,
-              name: r.name,
+              name: r.name || '',
+              place: (r.place || '').trim(),
               withFamily: Boolean(r.with_family !== undefined ? r.with_family : r.withFamily),
               greeting: r.greeting || (r.withFamily ? `${r.name} with Family` : r.name),
-              inviteUrl: r.invite_url || r.inviteUrl,
-              message: r.message,
+              inviteUrl: r.invite_url || r.inviteUrl || '',
+              message: r.message || '',
               date: r.date || date,
               time: r.time || time,
               timestamp: isNaN(dateObj.getTime()) ? Date.now() : dateObj.getTime()
@@ -1778,6 +1896,10 @@
         }
 
         async count() {
+          const local = this.getLocalBackup();
+          if (local && local.length > 0) {
+            return local.length;
+          }
           const list = await this.getAll();
           return list.length;
         }
@@ -1789,6 +1911,7 @@
       // DOM Elements
       // ========================================================
       const relativeNameInput = document.getElementById('relativeNameInput');
+      const guestPlaceInput = document.getElementById('guestPlaceInput');
       const withFamilyCheckbox = document.getElementById('withFamilyCheckbox');
       const familyToggleBox = document.getElementById('familyToggleBox');
       const displayInviteUrl = document.getElementById('displayInviteUrl');
@@ -1895,8 +2018,7 @@
       }
 
       // ========================================================
-      // Submit Form: Store in MySQL Database & Open WhatsApp
-      // (With Debounce Protection to prevent repeated/duplicate sends)
+      // Submit Form: Store in MySQL & Cloud Gist, Update Count & Open WhatsApp
       // ========================================================
       let isSendingWhatsApp = false;
 
@@ -1911,12 +2033,14 @@
           return;
         }
 
+        const guestPlace = (guestPlaceInput ? guestPlaceInput.value.trim() : '');
+
         isSendingWhatsApp = true;
         const btnSubmit = document.getElementById('btnSubmitSend');
         const originalBtnHtml = btnSubmit ? btnSubmit.innerHTML : '';
         if (btnSubmit) {
           btnSubmit.disabled = true;
-          btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Opening WhatsApp...</span>';
+          btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving & Opening WhatsApp...</span>';
         }
 
         const withFamily = withFamilyCheckbox.checked;
@@ -1924,13 +2048,14 @@
 
         const record = {
           name: relativeName,
+          place: guestPlace,
           withFamily: withFamily,
           greeting: greeting,
           inviteUrl: inviteUrl,
           message: message
         };
 
-        // 1. Immediately save to Database (instant local cache + cloud/MySQL sync)
+        // 1. Immediately save to Database (instant local storage cache + parallel MySQL/Gist sync)
         let saveRes = null;
         try {
           saveRes = await db.save(record);
@@ -1953,13 +2078,19 @@
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         window.open(waUrl, '_blank');
 
+        // Reset input fields so user is ready to send to next guest
+        relativeNameInput.value = '';
+        if (guestPlaceInput) guestPlaceInput.value = '';
+        updatePreview();
+        relativeNameInput.focus();
+
         setTimeout(() => {
           if (btnSubmit) {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = originalBtnHtml;
           }
           isSendingWhatsApp = false;
-        }, 1500);
+        }, 1200);
       });
 
       // Update count badges
@@ -1972,7 +2103,7 @@
       }
 
       // ========================================================
-      // Invitation History Display & Search Logic
+      // Invitation History Display & Search Logic (Sorted by Place)
       // ========================================================
       async function renderHistoryList(filterText = '') {
         const relatives = await db.getAll();
@@ -1992,7 +2123,8 @@
         if (filterText) {
           const q = filterText.toLowerCase();
           filtered = relatives.filter(r => 
-            (r.name && r.name.toLowerCase().includes(q))
+            (r.name && r.name.toLowerCase().includes(q)) ||
+            (r.place && r.place.toLowerCase().includes(q))
           );
         }
 
@@ -2009,6 +2141,7 @@
               <div class="history-rel-name">
                 <i class="fa-solid fa-user" style="color: var(--color-gold-bright); font-size: 0.85rem;"></i>
                 <span>${escapeHtml(item.name)}</span>
+                ${item.place ? `<span class="place-tag-badge"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.place)}</span>` : ''}
                 ${item.withFamily ? '<span class="family-tag-badge"><i class="fa-solid fa-people-roof"></i> with Family</span>' : ''}
               </div>
               <div class="history-rel-time">
@@ -2016,7 +2149,7 @@
               </div>
             </div>
             <div class="history-rel-actions">
-              <button type="button" class="btn-rel-action btn-rel-resend" data-name="${escapeHtml(item.name)}" data-family="${item.withFamily}">
+              <button type="button" class="btn-rel-action btn-rel-resend" data-name="${escapeHtml(item.name)}" data-place="${escapeHtml(item.place || '')}" data-family="${item.withFamily}">
                 <i class="fa-brands fa-whatsapp"></i> Resend via WhatsApp
               </button>
               <button type="button" class="btn-rel-action btn-rel-copy" data-url="${escapeHtml(item.inviteUrl)}">
@@ -2035,7 +2168,8 @@
         // Wire Resend
         historyRelativesList.querySelectorAll('.btn-rel-resend').forEach(btn => {
           btn.addEventListener('click', () => {
-            relativeNameInput.value = btn.getAttribute('data-name');
+            relativeNameInput.value = btn.getAttribute('data-name') || '';
+            if (guestPlaceInput) guestPlaceInput.value = btn.getAttribute('data-place') || '';
             withFamilyCheckbox.checked = btn.getAttribute('data-family') === 'true';
             updatePreview();
             closeHistoryModal();
@@ -2117,7 +2251,7 @@
         });
       }
 
-      // Export CSV
+      // Export CSV (Automatically sorted according to Place)
       if (btnExportCsv) {
         btnExportCsv.addEventListener('click', async () => {
           const list = await db.getAll();
@@ -2125,8 +2259,11 @@
             alert('No invitations in the database to export.');
             return;
           }
-          const headers = ['Relative Name', 'With Family', 'Date Sent', 'Time Sent', 'Invitation Link'];
-          const rows = list.map(r => [
+          // Sort automatically according to Place first, then Guest Name
+          const sorted = db.sortListByPlace(list);
+          const headers = ['Place / City', 'Guest Name', 'With Family', 'Date Sent', 'Time Sent', 'Personalized Invitation Link'];
+          const rows = sorted.map(r => [
+            `"${(r.place || 'Not Specified').replace(/"/g, '""')}"`,
             `"${(r.name || '').replace(/"/g, '""')}"`,
             r.withFamily ? '"Yes"' : '"No"',
             `"${r.date || ''}"`,
@@ -2137,10 +2274,12 @@
           const encodedUri = encodeURI(csvContent);
           const link = document.createElement('a');
           link.setAttribute('href', encodedUri);
-          link.setAttribute('download', `Juveriya_Wedding_Invitations_MySQL_${new Date().toISOString().slice(0, 10)}.csv`);
+          const todayDate = new Date().toISOString().slice(0, 10);
+          link.setAttribute('download', `Juveriya_Wedding_Invitations_Sorted_By_Place_${todayDate}.csv`);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+          showToast('CSV downloaded sorted by place!');
         });
       }
 

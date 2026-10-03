@@ -45,10 +45,12 @@ async function initMySQL() {
     });
 
     // 3. Ensure table exists
+    // 3. Ensure table exists with place column
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS invitations (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
+        place VARCHAR(255) DEFAULT '',
         with_family BOOLEAN DEFAULT FALSE,
         greeting VARCHAR(255) NOT NULL,
         invite_url TEXT NOT NULL,
@@ -57,6 +59,10 @@ async function initMySQL() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `;
     await pool.query(createTableQuery);
+
+    try {
+      await pool.query("ALTER TABLE invitations ADD COLUMN place VARCHAR(255) DEFAULT '' AFTER name");
+    } catch (e) {}
 
     isConnected = true;
     console.log(`\x1b[32m✔ Connected to MySQL database "${DB_NAME}" successfully!\x1b[0m`);
@@ -85,13 +91,15 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// GET all invitations
+// GET all invitations (automatically sorted according to place)
 app.get('/api/invitations', async (req, res) => {
   if (!isConnected || !pool) {
     return res.status(503).json({ error: 'MySQL database not yet connected', connected: false });
   }
   try {
-    const [rows] = await pool.query('SELECT * FROM invitations ORDER BY id DESC');
+    const [rows] = await pool.query(
+      "SELECT * FROM invitations ORDER BY CASE WHEN place IS NULL OR TRIM(place) = '' THEN 1 ELSE 0 END, place ASC, name ASC, id DESC"
+    );
     res.json({
       success: true,
       count: rows.length,
@@ -104,14 +112,14 @@ app.get('/api/invitations', async (req, res) => {
 });
 
 // Cloud Database & Gist Configuration
-const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fe4aa2796642';
 const GIST_ID = '22bf292d93eec0311a70d48436241829';
+const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;
 const { exec } = require('child_process');
 const fs = require('fs');
 
-// POST a new invitation
+// POST a new invitation with place
 app.post('/api/invitations', async (req, res) => {
-  const { name, withFamily, greeting, inviteUrl, message } = req.body;
+  const { name, place, withFamily, greeting, inviteUrl, message } = req.body;
   if (!name) {
     return res.status(400).json({ error: 'Name is required' });
   }
@@ -121,12 +129,14 @@ app.post('/api/invitations', async (req, res) => {
   }
 
   try {
+    const cleanPlace = (place || '').trim();
     const query = `
-      INSERT INTO invitations (name, with_family, greeting, invite_url, message)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO invitations (name, place, with_family, greeting, invite_url, message)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
     const [result] = await pool.query(query, [
       name.trim(),
+      cleanPlace,
       Boolean(withFamily),
       greeting || (withFamily ? `${name} with Family` : name),
       inviteUrl || '',
@@ -136,6 +146,7 @@ app.post('/api/invitations', async (req, res) => {
     const newItem = {
       id: result.insertId,
       name: name.trim(),
+      place: cleanPlace,
       withFamily: Boolean(withFamily),
       greeting: greeting || (withFamily ? `${name} with Family` : name),
       inviteUrl: inviteUrl || '',
@@ -150,7 +161,7 @@ app.post('/api/invitations', async (req, res) => {
       data: newItem
     });
 
-    // Sync changes to Cloud DB and Gist
+    // Sync changes to Cloud Gist in background
     pushMySQLToCloudAndGist().catch(e => console.warn('Background sync warning:', e.message));
   } catch (err) {
     console.error('Error inserting invitation into MySQL:', err);
@@ -195,16 +206,19 @@ app.delete('/api/invitations', async (req, res) => {
   }
 });
 
-// Push current MySQL table state to Cloud DB and Gist
+// Push current MySQL table state to Cloud Gist (sorted by place)
 async function pushMySQLToCloudAndGist() {
   if (!pool || !isConnected) return;
   try {
-    const [rows] = await pool.query('SELECT * FROM invitations ORDER BY id DESC');
+    const [rows] = await pool.query(
+      "SELECT * FROM invitations ORDER BY CASE WHEN place IS NULL OR TRIM(place) = '' THEN 1 ELSE 0 END, place ASC, name ASC, id DESC"
+    );
     const formatted = rows.map(r => {
       const dateObj = r.created_at ? new Date(r.created_at) : new Date();
       return {
         id: r.id,
         name: r.name,
+        place: r.place || '',
         withFamily: Boolean(r.with_family),
         greeting: r.greeting || (r.with_family ? `${r.name} with Family` : r.name),
         inviteUrl: r.invite_url,
@@ -216,56 +230,42 @@ async function pushMySQLToCloudAndGist() {
       };
     });
 
-    // 1. Update Cloud DB
-    try {
-      await fetch(CLOUD_DB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'Juveriya Wedding Invitations',
-          data: { invitations: formatted }
-        }),
-        signal: AbortSignal.timeout(4000)
-      });
-      console.log('✔ Cloud DB synchronized with MySQL');
-    } catch (e) {
-      console.warn('Cloud DB update error:', e.message);
-    }
-
-    // 2. Update Gist backup
+    // Update Gist backup via authenticated gh CLI
     try {
       const tmpPath = path.join('/tmp', 'juveriya_invitations.json');
-      fs.writeFileSync(tmpPath, JSON.stringify(formatted));
+      fs.writeFileSync(tmpPath, JSON.stringify(formatted, null, 2));
       exec(`gh gist edit ${GIST_ID} -f invitations.json ${tmpPath}`, (err) => {
-        if (!err) console.log('✔ Gist synchronized with MySQL');
+        if (!err) console.log('✔ Gist synchronized with MySQL (sorted by place)');
       });
     } catch (e) {
-      console.warn('Gist sync error:', e.message);
+      console.warn('gh CLI sync notice:', e.message);
     }
   } catch (e) {
     console.warn('Error pushing MySQL state to cloud:', e.message);
   }
 }
 
-// Bidirectional Sync: Pull from Cloud DB and Push any missing MySQL records
+// Bidirectional Sync: Pull from Gist and Push any missing MySQL records
 async function syncWithCloudDB() {
   if (!pool || !isConnected) return;
   try {
     let cloudInvitations = [];
     try {
-      const cRes = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(4000) });
-      if (cRes.ok) {
-        const cJson = await cRes.json();
-        if (cJson && cJson.data && Array.isArray(cJson.data.invitations)) {
-          cloudInvitations = cJson.data.invitations;
+      const gRes = await fetch(`https://gist.githubusercontent.com/salmankhan080405-bot/${GIST_ID}/raw/invitations.json?_t=${Date.now()}`, {
+        signal: AbortSignal.timeout(4000)
+      });
+      if (gRes.ok) {
+        const parsed = await gRes.json();
+        if (Array.isArray(parsed)) {
+          cloudInvitations = parsed;
         }
       }
     } catch (e) {
-      console.warn('Cloud DB pull warning:', e.message);
+      console.warn('Gist pull warning:', e.message);
     }
 
     // Fetch MySQL records
-    const [mysqlRows] = await pool.query('SELECT * FROM invitations ORDER BY id DESC');
+    const [mysqlRows] = await pool.query('SELECT * FROM invitations');
     const mysqlMap = new Map();
     mysqlRows.forEach(r => {
       const key = (r.name || '').trim().toLowerCase();
@@ -279,10 +279,11 @@ async function syncWithCloudDB() {
       if (key && !mysqlMap.has(key)) {
         try {
           await pool.query(
-            `INSERT INTO invitations (name, with_family, greeting, invite_url, message, created_at)
-             VALUES (?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO invitations (name, place, with_family, greeting, invite_url, message, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
               cItem.name.trim(),
+              (cItem.place || '').trim(),
               Boolean(cItem.withFamily),
               cItem.greeting || (cItem.withFamily ? `${cItem.name} with Family` : cItem.name),
               cItem.inviteUrl || '',
@@ -291,14 +292,14 @@ async function syncWithCloudDB() {
             ]
           );
           newlyInserted = true;
-          console.log(`📥 Synced invitation from Cloud/Phone to MySQL: ${cItem.name}`);
+          console.log(`📥 Synced invitation from Cloud/Phone to MySQL: ${cItem.name} (${cItem.place || 'No place'})`);
         } catch (insertErr) {
           console.warn('Error inserting cloud item into MySQL:', insertErr.message);
         }
       }
     }
 
-    // If new items were inserted or MySQL has items not yet in Cloud DB, update Cloud DB
+    // If new items were inserted or MySQL has items not yet in Gist, update Gist
     if (newlyInserted || mysqlRows.length > cloudInvitations.length) {
       await pushMySQLToCloudAndGist();
     }

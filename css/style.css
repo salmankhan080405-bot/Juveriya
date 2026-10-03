@@ -368,6 +368,26 @@ body {
   gap: 10px;
   box-shadow: 0 8px 24px rgba(223, 183, 108, 0.4);
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.auto-advance-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 0%;
+  background: linear-gradient(90deg, #b8860b 0%, #ffd700 50%, #ffffff 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+  animation: autoAdvanceFill 2s linear forwards;
+  pointer-events: none;
+}
+
+@keyframes autoAdvanceFill {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
 
 .gate-submit-btn:hover {
@@ -1071,6 +1091,8 @@ body {
   outline: none;
   text-align: center;
   touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
 }
 
 .card-tap-btn .tap-icon {
