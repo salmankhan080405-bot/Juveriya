@@ -104,14 +104,45 @@
       <span class="monogram-amp">&amp;</span>
       <span class="monogram-letter">J</span>
     </div>
+    <div class="nav-controls">
+      <button type="button" class="nav-btn" id="btnHeaderRefPhoto" title="View Reference Design Photo">
+        <i class="fa-solid fa-camera"></i>
+        <span class="btn-text">Reference Photo</span>
+      </button>
+    </div>
   </header>
 
   <!-- Main 3D Card Scene Container -->
   <main class="scene-container">
     
+    <!-- Sequential 3-Step Unfolding Status Banner (1 second for each step) -->
+    <div class="unfold-step-banner" id="unfoldStepBanner" aria-live="polite">
+      <span class="step-badge" id="stepBadgeText">Step 1 of 3: Unfolding Horizontally ✦</span>
+      <div class="step-dots">
+        <span class="step-dot" id="stepDot1"></span>
+        <span class="step-dot" id="stepDot2"></span>
+        <span class="step-dot" id="stepDot3"></span>
+      </div>
+    </div>
+
     <!-- 3D Perspective Wrapper with Interactive Tilt -->
     <div class="card-3d-wrapper" id="cardWrapper">
       <div class="wedding-card-3d" id="weddingCard">
+
+        <!-- Diagonal Origami Blossom Facets (Unfolds during Step 2) -->
+        <div class="origami-corner origami-corner-tl" aria-hidden="true">
+          <div class="origami-triangle"><span class="origami-star">✦</span></div>
+        </div>
+        <div class="origami-corner origami-corner-tr" aria-hidden="true">
+          <div class="origami-triangle"><span class="origami-star">✦</span></div>
+        </div>
+        <div class="origami-corner origami-corner-bl" aria-hidden="true">
+          <div class="origami-triangle"><span class="origami-star">✦</span></div>
+        </div>
+        <div class="origami-corner origami-corner-br" aria-hidden="true">
+          <div class="origami-triangle"><span class="origami-star">✦</span></div>
+        </div>
+        <div class="diagonal-foil-beam" id="diagonalFoilBeam" aria-hidden="true"></div>
 
         <!-- ======================================================== -->
         <!-- FRONT EMBOSSED BISMILLAH ARABIC CALLIGRAPHY ARCH         -->
@@ -401,12 +432,35 @@
             </div>
           </div>
           <div class="gallery-item">
-            <div class="gallery-badge">Original Design Reference</div>
-            <img src="assets/images/reference_card.jpg" alt="Original Reference Card">
+            <div class="gallery-badge">Reference Design Photo</div>
+            <img src="assets/images/reference_photo.png" alt="Juveriya & Abdul Hadi Reference Wedding Card" id="galleryImgRef">
             <div class="gallery-actions">
-              <span class="ref-tag">Original Reference</span>
+              <a href="assets/images/reference_photo.png" download="Juveriya_AbdulHadi_Reference_Card.png" class="download-link">
+                <i class="fa-solid fa-download"></i> Download Reference
+              </a>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated Modal: Reference Design Photo Lightbox -->
+  <div class="modal-backdrop" id="refPhotoModal">
+    <div class="modal-card modal-gallery" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-camera"></i> Reference Design Photo</h3>
+        <button class="modal-close" id="btnCloseRefPhoto">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 14px;">
+        <p class="modal-desc" style="margin-bottom: 12px;">
+          Original reference design card for Abdul Hadi &amp; Juveriya's royal wedding celebration.
+        </p>
+        <img src="assets/images/reference_photo.png" alt="Reference Wedding Card Photo" style="max-width: 100%; border-radius: 8px; border: 1.5px solid var(--color-gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.85);">
+        <div style="margin-top: 14px;">
+          <a href="assets/images/reference_photo.png" download="Reference_Wedding_Card.png" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 20px; font-size: 0.85rem;">
+            <i class="fa-solid fa-download"></i> Download Reference Photo
+          </a>
         </div>
       </div>
     </div>
@@ -560,6 +614,6 @@
   </div>
 
   <!-- Master Application Script (with Cache Buster) -->
-  <script src="js/app.js?v=13.0"></script>
+  <script src="js/app.js?v=14.0"></script>
 </body>
 </html>

@@ -152,6 +152,41 @@
       if (gateFallbackView) gateFallbackView.style.display = 'block';
     }
 
+    // Direct step testing parameter support (e.g. ?step=0, ?step=1, ?step=2, ?step=3)
+    const testStepParam = urlParams.get('step');
+    if (testStepParam !== null) {
+      if (guestGateScreen) guestGateScreen.classList.add('is-hidden');
+      if (gateAutoAdvanceTimer) clearTimeout(gateAutoAdvanceTimer);
+      if (cardAutoOpenTimer) clearTimeout(cardAutoOpenTimer);
+
+      if (testStepParam === '0') {
+        currentUnfoldStep = 0;
+        weddingCard.classList.remove('unfolding-active', 'step-1-horizontal', 'step-2-diagonal', 'step-3-vertical', 'is-open');
+        isOpen = false;
+        updateCardScale();
+      } else if (testStepParam === '1') {
+        currentUnfoldStep = 1;
+        weddingCard.classList.remove('step-2-diagonal', 'step-3-vertical', 'is-open');
+        weddingCard.classList.add('unfolding-active', 'step-1-horizontal');
+        updateStepIndicator(1);
+        updateCardScale();
+      } else if (testStepParam === '2') {
+        currentUnfoldStep = 2;
+        weddingCard.classList.remove('step-1-horizontal', 'step-3-vertical', 'is-open');
+        weddingCard.classList.add('unfolding-active', 'step-2-diagonal');
+        updateStepIndicator(2);
+        updateCardScale();
+      } else if (testStepParam === '3') {
+        currentUnfoldStep = 4;
+        weddingCard.classList.remove('step-1-horizontal', 'step-2-diagonal');
+        weddingCard.classList.add('step-3-vertical', 'is-open');
+        isOpen = true;
+        updateStepIndicator(4);
+        updateCardScale();
+      }
+      return;
+    }
+
     // Always display this welcome gate screen as the main webpage on load/refresh
     guestGateScreen.classList.remove('is-hidden');
 
@@ -366,6 +401,50 @@
     }
   }
 
+  // Step 2: Diagonal Unfolding Sparkle Chime Sound
+  function playDiagonalChimeSound() {
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      const frequencies = [554.37, 659.25, 830.61, 987.77, 1108.73];
+      frequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.0001, now + idx * 0.08);
+        gain.gain.linearRampToValueAtTime(0.1, now + idx * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.85);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.9);
+      });
+    } catch (e) {}
+  }
+
+  // Step 3: Vertical Unfolding Royal Flourish Chime Sound
+  function playCompletionHarpSound() {
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      const frequencies = [523.25, 659.25, 783.99, 1046.50];
+      frequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+        gain.gain.setValueAtTime(0.0001, now + idx * 0.09);
+        gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.09 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.09 + 1.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.09);
+        osc.stop(now + idx * 0.09 + 1.2);
+      });
+    } catch (e) {}
+  }
+
   // Ambient Wedding Sitar / Santoor Melody Generator
   function startAmbientMelody() {
     try {
@@ -442,9 +521,80 @@
   }
 
   // =========================================================================
-  // 3D Card Folding Interaction (Explicit Open / Close with Debounce)
+  // Sequential 3-Step 3D Card Unfolding (1 Second for each Step)
+  // Step 1 (0s to 1s): Horizontally
+  // Step 2 (1s to 2s): Diagonally
+  // Step 3 (2s to 3s): Vertically -> Fully Open Reference Photo Card!
   // =========================================================================
-  let lastCardActionTime = 0;
+  let currentUnfoldStep = 0;
+  let isUnfolding = false;
+  let unfoldStepTimeout1 = null;
+  let unfoldStepTimeout2 = null;
+  let unfoldStepTimeout3 = null;
+  let bannerFadeTimeout = null;
+
+  function updateStepIndicator(step) {
+    const banner = document.getElementById('unfoldStepBanner');
+    const badge = document.getElementById('stepBadgeText');
+    const dot1 = document.getElementById('stepDot1');
+    const dot2 = document.getElementById('stepDot2');
+    const dot3 = document.getElementById('stepDot3');
+    if (!banner || !badge) return;
+
+    if (bannerFadeTimeout) {
+      clearTimeout(bannerFadeTimeout);
+      bannerFadeTimeout = null;
+    }
+
+    banner.classList.remove('fade-out');
+    banner.classList.add('is-active');
+
+    if (step === 1) {
+      badge.textContent = '✦ Step 1 of 3: Unfolding Horizontally ✦';
+      if (dot1) dot1.classList.add('active');
+      if (dot2) dot2.classList.remove('active');
+      if (dot3) dot3.classList.remove('active');
+    } else if (step === 2) {
+      badge.textContent = '✦ Step 2 of 3: Unfolding Diagonally ✦';
+      if (dot1) dot1.classList.add('active');
+      if (dot2) dot2.classList.add('active');
+      if (dot3) dot3.classList.remove('active');
+    } else if (step === 3) {
+      badge.textContent = '✦ Step 3 of 3: Unfolding Vertically ✦';
+      if (dot1) dot1.classList.add('active');
+      if (dot2) dot2.classList.add('active');
+      if (dot3) dot3.classList.add('active');
+    } else if (step === 4) {
+      badge.textContent = '✦ Royal Wedding Card Opened ✦';
+      if (dot1) dot1.classList.add('active');
+      if (dot2) dot2.classList.add('active');
+      if (dot3) dot3.classList.add('active');
+      bannerFadeTimeout = setTimeout(() => {
+        if (banner) banner.classList.add('fade-out');
+      }, 2500);
+    }
+  }
+
+  let currentScale = 1;
+
+  function updateCardScale() {
+    const isCardOpen = weddingCard && (
+      weddingCard.classList.contains('is-open') ||
+      weddingCard.classList.contains('step-1-horizontal') ||
+      weddingCard.classList.contains('step-2-diagonal') ||
+      weddingCard.classList.contains('step-3-vertical')
+    );
+    // Closed square card is 440px wide. Open card has 2 flaps unfolded (total width 880px).
+    const targetWidth = isCardOpen ? 900 : 460;
+    const targetHeight = isCardOpen ? 680 : 480;
+    const availWidth = Math.max(300, window.innerWidth - 24);
+    const availHeight = Math.max(400, window.innerHeight - 120);
+    const scaleW = availWidth / targetWidth;
+    const scaleH = availHeight / targetHeight;
+    currentScale = Math.min(1, scaleW, scaleH);
+    if (currentScale < 0.38) currentScale = 0.38;
+    document.documentElement.style.setProperty('--card-scale', currentScale);
+  }
 
   function openCard(e) {
     if (e && e.stopPropagation) {
@@ -455,52 +605,97 @@
       clearTimeout(cardAutoOpenTimer);
       cardAutoOpenTimer = null;
     }
-    if (isOpen) return;
-    isOpen = true;
-    lastCardActionTime = Date.now();
-    weddingCard.classList.add('is-open');
+    if (isOpen || isUnfolding) return;
+    isUnfolding = true;
 
-    try {
-      playUnfoldSound();
-    } catch (err) {
-      console.warn('Audio effect error:', err);
-    }
+    // Clear any previous timeouts
+    if (unfoldStepTimeout1) clearTimeout(unfoldStepTimeout1);
+    if (unfoldStepTimeout2) clearTimeout(unfoldStepTimeout2);
+    if (unfoldStepTimeout3) clearTimeout(unfoldStepTimeout3);
 
+    // Audio melody auto-play
     try {
       if (!isAudioPlaying && !sessionStorage.getItem('audioPrompted')) {
         sessionStorage.setItem('audioPrompted', 'true');
         startAmbientMelody();
       }
-    } catch (err) {
-      console.warn('Audio melody error:', err);
-    }
-    // "for last page no limit" -> Stays open indefinitely with all details visible
+    } catch (err) {}
+
+    // Clear inline transform on weddingCard so CSS classes control 3D transforms
+    if (weddingCard) weddingCard.style.transform = '';
+
+    // -----------------------------------------------------------------
+    // STEP 1: Unfolding Horizontally (0s to 1s)
+    // -----------------------------------------------------------------
+    currentUnfoldStep = 1;
+    weddingCard.classList.remove('step-2-diagonal', 'step-3-vertical', 'is-open');
+    weddingCard.classList.add('unfolding-active', 'step-1-horizontal');
+    updateStepIndicator(1);
+    updateCardScale();
+
+    try {
+      playUnfoldSound();
+    } catch (err) {}
+
+    // -----------------------------------------------------------------
+    // STEP 2: Unfolding Diagonally (1s to 2s)
+    // -----------------------------------------------------------------
+    unfoldStepTimeout1 = setTimeout(() => {
+      currentUnfoldStep = 2;
+      weddingCard.classList.remove('step-1-horizontal');
+      weddingCard.classList.add('step-2-diagonal');
+      updateStepIndicator(2);
+      updateCardScale();
+
+      try {
+        playDiagonalChimeSound();
+      } catch (err) {}
+    }, 1000);
+
+    // -----------------------------------------------------------------
+    // STEP 3: Unfolding Vertically (2s to 3s)
+    // -----------------------------------------------------------------
+    unfoldStepTimeout2 = setTimeout(() => {
+      currentUnfoldStep = 3;
+      weddingCard.classList.remove('step-2-diagonal');
+      weddingCard.classList.add('step-3-vertical', 'is-open');
+      updateStepIndicator(3);
+      updateCardScale();
+
+      try {
+        playCompletionHarpSound();
+      } catch (err) {}
+    }, 2000);
+
+    // -----------------------------------------------------------------
+    // COMPLETED: Final Opened Reference Photo Card at 3s
+    // Stays open indefinitely without closing!
+    // -----------------------------------------------------------------
+    unfoldStepTimeout3 = setTimeout(() => {
+      currentUnfoldStep = 4;
+      isOpen = true;
+      isUnfolding = false;
+      weddingCard.classList.remove('step-1-horizontal', 'step-2-diagonal');
+      weddingCard.classList.add('step-3-vertical', 'is-open');
+      updateStepIndicator(4);
+      updateCardScale();
+    }, 3000);
   }
 
   function closeCard(e) {
     if (e && e.stopPropagation) {
       e.stopPropagation();
     }
-    // Prevent immediate re-closing within 1200ms of opening
-    if (!isOpen || (Date.now() - lastCardActionTime < 1200)) return;
-    isOpen = false;
-    lastCardActionTime = Date.now();
-    weddingCard.classList.remove('is-open');
-
-    try {
-      playUnfoldSound();
-    } catch (err) {
-      console.warn('Audio effect error:', err);
-    }
+    // "for last page no limit... stays open indefinitely so guests can view without being closed"
+    // Never auto-close or close on accidental click.
+    return;
   }
 
   function toggleCardFold(e) {
     if (e && e.stopPropagation) {
       e.stopPropagation();
     }
-    if (isOpen) {
-      closeCard(e);
-    } else {
+    if (!isOpen && !isUnfolding) {
       openCard(e);
     }
   }
@@ -524,8 +719,8 @@
     const deltaX = (clientX - centerX) / (window.innerWidth / 2);
     const deltaY = (clientY - centerY) / (window.innerHeight / 2);
 
-    targetRotateY = Math.max(-18, Math.min(18, deltaX * 16));
-    targetRotateX = Math.max(-14, Math.min(14, -deltaY * 14));
+    targetRotateY = Math.max(-16, Math.min(16, deltaX * 14));
+    targetRotateX = Math.max(-12, Math.min(12, -deltaY * 12));
 
     // Dynamic light sheen reflection
     const sheenX = 50 + deltaX * 40;
@@ -544,10 +739,14 @@
     currentRotateX += (targetRotateX - currentRotateX) * 0.08;
     currentRotateY += (targetRotateY - currentRotateY) * 0.08;
 
-    weddingCard.style.transform = `rotateX(${currentRotateX.toFixed(2)}deg) rotateY(${currentRotateY.toFixed(2)}deg)`;
+    if (cardWrapper) {
+      cardWrapper.style.transform = `scale(${currentScale}) rotateX(${currentRotateX.toFixed(2)}deg) rotateY(${currentRotateY.toFixed(2)}deg)`;
+    }
     requestAnimationFrame(updateCardTilt);
   }
   requestAnimationFrame(updateCardTilt);
+  window.addEventListener('resize', updateCardScale);
+  window.addEventListener('orientationchange', updateCardScale);
 
   // =========================================================================
   // Canvas Particles: Falling Rose Petals & Gold Dust
@@ -876,15 +1075,11 @@
       });
     }
 
-    // Card Body: When closed, any tap opens. When open, only closes if deliberate tap on background
+    // Card Body: When closed, tap opens card in 3 sequential steps. When open, stays open indefinitely!
     if (weddingCard) {
       weddingCard.addEventListener('click', (e) => {
-        if (!isOpen) {
+        if (!isOpen && currentUnfoldStep === 0) {
           handleOpenTrigger(e);
-        } else {
-          // If already open, do NOT close when tapping links, buttons, or inputs
-          if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
-          closeCard(e);
         }
       });
     }
@@ -892,6 +1087,21 @@
     // Navigation Controls (Optional)
     if (btnAudioToggle) btnAudioToggle.addEventListener('click', toggleAudio);
     if (btnPetalsToggle) btnPetalsToggle.addEventListener('click', togglePetals);
+
+    // Reference Design Photo Lightbox Modal
+    const btnHeaderRefPhoto = document.getElementById('btnHeaderRefPhoto');
+    const refPhotoModal = document.getElementById('refPhotoModal');
+    const btnCloseRefPhoto = document.getElementById('btnCloseRefPhoto');
+    if (btnHeaderRefPhoto && refPhotoModal) {
+      btnHeaderRefPhoto.addEventListener('click', () => {
+        refPhotoModal.classList.add('is-active');
+      });
+    }
+    if (btnCloseRefPhoto && refPhotoModal) {
+      btnCloseRefPhoto.addEventListener('click', () => {
+        refPhotoModal.classList.remove('is-active');
+      });
+    }
 
     // 3D Photos Gallery Modal (Optional)
     if (btnGalleryToggle) {
@@ -921,7 +1131,7 @@
     if (btnResetDefaults) btnResetDefaults.addEventListener('click', handleResetDefaults);
 
     // Close Modals on backdrop click
-    [galleryModal, customizerModal, document.getElementById('waSenderModal')].forEach(modal => {
+    [galleryModal, customizerModal, refPhotoModal, document.getElementById('waSenderModal')].forEach(modal => {
       if (!modal) return;
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {

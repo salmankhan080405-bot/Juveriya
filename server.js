@@ -111,6 +111,32 @@ app.get('/api/invitations', async (req, res) => {
   }
 });
 
+// GET CSV export endpoint (automatically sorted by place)
+app.get('/api/invitations/export', async (req, res) => {
+  if (!isConnected || !pool) {
+    return res.status(503).json({ error: 'MySQL database not yet connected' });
+  }
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM invitations ORDER BY CASE WHEN place IS NULL OR TRIM(place) = '' THEN 1 ELSE 0 END, place ASC, name ASC, id DESC"
+    );
+    const headers = ['Place / City', 'Guest Name', 'With Family', 'Created At', 'Personalized Invitation Link'];
+    const csvRows = rows.map(r => [
+      `"${(r.place || 'Not Specified').replace(/"/g, '""')}"`,
+      `"${(r.name || '').replace(/"/g, '""')}"`,
+      r.with_family ? '"Yes"' : '"No"',
+      `"${r.created_at ? new Date(r.created_at).toISOString() : ''}"`,
+      `"${(r.invite_url || '').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = '\uFEFF' + [headers.join(','), ...csvRows.map(e => e.join(','))].join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="Juveriya_Wedding_Invitations_Sorted_By_Place_${new Date().toISOString().slice(0, 10)}.csv"`);
+    res.send(csvContent);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Cloud Database & Gist Configuration
 const GIST_ID = '22bf292d93eec0311a70d48436241829';
 const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;

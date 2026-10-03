@@ -24,7 +24,9 @@
   --font-sans: 'Montserrat', sans-serif;
   
   --card-width: 440px;
-  --card-height: 640px;
+  --card-closed-height: 440px;
+  --card-open-height: 640px;
+  --card-height: var(--card-closed-height);
   --card-scale: 1;
   --shadow-elevation: 0 25px 60px rgba(0, 0, 0, 0.75), 0 10px 25px rgba(0, 0, 0, 0.5);
 }
@@ -77,6 +79,7 @@ body {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  display: none;
 }
 
 .guest-gate-card {
@@ -500,6 +503,75 @@ body {
   z-index: 10;
 }
 
+/* ==========================================================================
+   2B. SEQUENTIAL 3-STEP UNFOLDING STATUS BANNER
+   1 Second for each step (Horizontal, Diagonal, Vertical)
+   ========================================================================== */
+.unfold-step-banner {
+  position: relative;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(13, 78, 59, 0.95) 0%, rgba(6, 40, 30, 0.98) 75%),
+    #06281e;
+  border: 1.5px solid var(--color-gold-primary);
+  border-radius: 30px;
+  padding: 8px 24px;
+  z-index: 80;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(223, 183, 108, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.unfold-step-banner.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.unfold-step-banner.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+}
+
+.step-badge {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-gold-bright);
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.step-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.step-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(223, 183, 108, 0.25);
+  border: 1px solid var(--color-gold-primary);
+  transition: all 0.35s ease;
+}
+
+.step-dot.active {
+  background: var(--color-gold-bright);
+  box-shadow: 0 0 10px var(--color-gold-bright), 0 0 18px rgba(255, 215, 0, 0.8);
+  transform: scale(1.35);
+}
+
 .guest-invitation-ribbon {
   margin-bottom: 22px;
   animation: ribbonGlow 3s ease-in-out infinite alternate;
@@ -615,12 +687,134 @@ body {
 .wedding-card-3d {
   position: relative;
   width: var(--card-width);
-  height: var(--card-height);
+  height: var(--card-closed-height);
   transform-style: preserve-3d;
   box-shadow: var(--shadow-elevation);
   border-radius: 12px;
   cursor: default;
-  transition: transform 0.5s cubic-bezier(0.15, 0.9, 0.25, 1);
+  transition: height 1s cubic-bezier(0.25, 1, 0.35, 1), transform 0.8s cubic-bezier(0.25, 1, 0.35, 1), box-shadow 0.6s ease;
+}
+
+/* Sequential Unfolding Step 3D Transformations (1 Second Each) */
+.wedding-card-3d.step-1-horizontal {
+  height: var(--card-closed-height);
+  transform: rotateX(0deg) rotateY(0deg) scale(1);
+}
+
+.wedding-card-3d.step-2-diagonal {
+  height: var(--card-closed-height);
+  transform: rotate3d(1, 1, 0, 14deg) scale(1.02);
+  box-shadow: -20px 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(223, 183, 108, 0.35);
+}
+
+.wedding-card-3d.step-3-vertical,
+.wedding-card-3d.is-open {
+  height: var(--card-open-height);
+  transform: rotateX(2.5deg) rotateY(0deg) scale(1);
+  box-shadow: var(--shadow-elevation);
+}
+
+/* Diagonal Origami Corner Blossom Facets (Blooms during Step 2) */
+.origami-corner {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  z-index: 45;
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+}
+
+.origami-triangle {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, #0d4e3b 0%, #06281e 80%);
+  border: 1.5px solid var(--color-gold-bright);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(223, 183, 108, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.origami-star {
+  font-size: 0.95rem;
+  color: var(--color-gold-bright);
+  text-shadow: 0 0 8px #ffd700;
+  animation: origamiStarSpin 2s linear infinite;
+}
+
+@keyframes origamiStarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.origami-corner-tl { top: -10px; left: -10px; }
+.origami-corner-tr { top: -10px; right: -10px; }
+.origami-corner-bl { bottom: -10px; left: -10px; }
+.origami-corner-br { bottom: -10px; right: -10px; }
+
+.wedding-card-3d.step-2-diagonal .origami-corner-tl {
+  opacity: 1;
+  transform: translate(-14px, -14px) rotate(-45deg) scale(1);
+}
+.wedding-card-3d.step-2-diagonal .origami-corner-tr {
+  opacity: 1;
+  transform: translate(14px, -14px) rotate(45deg) scale(1);
+}
+.wedding-card-3d.step-2-diagonal .origami-corner-bl {
+  opacity: 1;
+  transform: translate(-14px, 14px) rotate(-135deg) scale(1);
+}
+.wedding-card-3d.step-2-diagonal .origami-corner-br {
+  opacity: 1;
+  transform: translate(14px, 14px) rotate(135deg) scale(1);
+}
+
+.wedding-card-3d.step-3-vertical .origami-corner,
+.wedding-card-3d.is-open .origami-corner {
+  opacity: 0;
+  transform: scale(0.3);
+}
+
+/* Diagonal Gold Foil Light Beam (Sweeps across during Step 2) */
+.diagonal-foil-beam {
+  position: absolute;
+  inset: -80px;
+  pointer-events: none;
+  z-index: 55;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255, 235, 160, 0.25) 45%,
+    rgba(255, 255, 255, 0.75) 50%,
+    rgba(223, 183, 108, 0.35) 55%,
+    transparent 70%
+  );
+  opacity: 0;
+  transform: translateX(-100%) translateY(-100%);
+}
+
+.wedding-card-3d.step-2-diagonal .diagonal-foil-beam {
+  animation: diagonalBeamSweep 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes diagonalBeamSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-80%) translateY(-80%);
+  }
+  30% {
+    opacity: 0.95;
+  }
+  70% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(80%) translateY(80%);
+  }
 }
 
 /* Dynamic Sheen Overlay (moves with mouse tilt) */
@@ -702,6 +896,9 @@ body {
 }
 
 /* When the card is opened, front Bismillah crest gracefully dissolves away */
+.wedding-card-3d.step-1-horizontal .front-bismillah-wrapper,
+.wedding-card-3d.step-2-diagonal .front-bismillah-wrapper,
+.wedding-card-3d.step-3-vertical .front-bismillah-wrapper,
 .wedding-card-3d.is-open .front-bismillah-wrapper {
   transform: translate(-50%, -50%) translateZ(-20px) scale(0);
   opacity: 0;
@@ -719,7 +916,7 @@ body {
   width: 50%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 1.25s cubic-bezier(0.25, 1, 0.35, 1);
+  transition: transform 1s cubic-bezier(0.25, 1, 0.35, 1);
   z-index: 30;
 }
 
@@ -737,14 +934,20 @@ body {
   border-bottom-right-radius: 12px;
 }
 
-/* Open Card State */
+/* Open Card State (Unfolds horizontally during Step 1, stays open through Step 2 & 3) */
+.wedding-card-3d.step-1-horizontal .flap-left,
+.wedding-card-3d.step-2-diagonal .flap-left,
+.wedding-card-3d.step-3-vertical .flap-left,
 .wedding-card-3d.is-open .flap-left {
-  transform: rotateY(-172deg);
+  transform: rotateY(-168deg);
   box-shadow: -15px 15px 35px rgba(0, 0, 0, 0.6);
 }
 
+.wedding-card-3d.step-1-horizontal .flap-right,
+.wedding-card-3d.step-2-diagonal .flap-right,
+.wedding-card-3d.step-3-vertical .flap-right,
 .wedding-card-3d.is-open .flap-right {
-  transform: rotateY(172deg);
+  transform: rotateY(168deg);
   box-shadow: 15px 15px 35px rgba(0, 0, 0, 0.6);
 }
 
@@ -1057,6 +1260,9 @@ body {
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
 }
 
+.wedding-card-3d.step-1-horizontal .card-tap-container,
+.wedding-card-3d.step-2-diagonal .card-tap-container,
+.wedding-card-3d.step-3-vertical .card-tap-container,
 .wedding-card-3d.is-open .card-tap-container {
   transform: translateZ(-30px) scale(0);
   opacity: 0;
@@ -1242,6 +1448,9 @@ body {
 }
 
 /* Wax Seal state when opened */
+.wedding-card-3d.step-1-horizontal .wax-seal-wrapper,
+.wedding-card-3d.step-2-diagonal .wax-seal-wrapper,
+.wedding-card-3d.step-3-vertical .wax-seal-wrapper,
 .wedding-card-3d.is-open .wax-seal-wrapper {
   transform: translate(-50%, -50%) translateZ(-30px) scale(0);
   opacity: 0;
@@ -1831,7 +2040,9 @@ body {
 @media (max-width: 900px) {
   :root {
     --card-width: 380px;
-    --card-height: 560px;
+    --card-closed-height: 380px;
+    --card-open-height: 560px;
+    --card-height: var(--card-closed-height);
   }
   .person-name { font-size: 1.65rem; }
   .arabic-bismillah { font-size: 1.45rem; }
@@ -1843,7 +2054,9 @@ body {
 @media (max-width: 650px) {
   :root {
     --card-width: 330px;
-    --card-height: 520px;
+    --card-closed-height: 330px;
+    --card-open-height: 520px;
+    --card-height: var(--card-closed-height);
   }
   .top-nav {
     padding: 12px 16px;
@@ -1873,7 +2086,9 @@ body {
 @media (max-width: 380px) {
   :root {
     --card-width: 295px;
-    --card-height: 480px;
+    --card-closed-height: 295px;
+    --card-open-height: 480px;
+    --card-height: var(--card-closed-height);
   }
   .person-name { font-size: 1.25rem; }
   .front-bismillah-arabic { font-size: 1.4rem; }
