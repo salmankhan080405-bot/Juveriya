@@ -103,6 +103,12 @@ app.get('/api/invitations', async (req, res) => {
   }
 });
 
+// Cloud Database & Gist Configuration
+const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fe4aa2796642';
+const GIST_ID = '22bf292d93eec0311a70d48436241829';
+const { exec } = require('child_process');
+const fs = require('fs');
+
 // POST a new invitation
 app.post('/api/invitations', async (req, res) => {
   const { name, withFamily, greeting, inviteUrl, message } = req.body;
@@ -127,22 +133,25 @@ app.post('/api/invitations', async (req, res) => {
       message || ''
     ]);
 
+    const newItem = {
+      id: result.insertId,
+      name: name.trim(),
+      withFamily: Boolean(withFamily),
+      greeting: greeting || (withFamily ? `${name} with Family` : name),
+      inviteUrl: inviteUrl || '',
+      message: message || '',
+      created_at: new Date()
+    };
+
     res.status(201).json({
       success: true,
       message: 'Invitation stored in MySQL database',
       id: result.insertId,
-      data: {
-        id: result.insertId,
-        name,
-        withFamily: Boolean(withFamily),
-        greeting,
-        inviteUrl,
-        message,
-        created_at: new Date()
-      }
+      data: newItem
     });
 
-    syncGist();
+    // Sync changes to Cloud DB and Gist
+    pushMySQLToCloudAndGist().catch(e => console.warn('Background sync warning:', e.message));
   } catch (err) {
     console.error('Error inserting invitation into MySQL:', err);
     res.status(500).json({ error: err.message });
@@ -163,7 +172,7 @@ app.delete('/api/invitations/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM invitations WHERE id = ?', [id]);
     res.json({ success: true, message: `Invitation ${id} deleted from MySQL` });
-    syncGist();
+    pushMySQLToCloudAndGist().catch(e => console.warn('Background sync warning:', e.message));
   } catch (err) {
     console.error('Error deleting invitation from MySQL:', err);
     res.status(500).json({ error: err.message });
@@ -179,18 +188,15 @@ app.delete('/api/invitations', async (req, res) => {
   try {
     await pool.query('TRUNCATE TABLE invitations');
     res.json({ success: true, message: 'All invitation history cleared from MySQL' });
-    syncGist();
+    pushMySQLToCloudAndGist().catch(e => console.warn('Background sync warning:', e.message));
   } catch (err) {
     console.error('Error truncating invitations in MySQL:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Sync Gist backup helper
-const { exec } = require('child_process');
-const fs = require('fs');
-
-async function syncGist() {
+// Push current MySQL table state to Cloud DB and Gist
+async function pushMySQLToCloudAndGist() {
   if (!pool || !isConnected) return;
   try {
     const [rows] = await pool.query('SELECT * FROM invitations ORDER BY id DESC');
@@ -205,16 +211,99 @@ async function syncGist() {
         message: r.message,
         date: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
         time: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: dateObj.getTime()
+        timestamp: dateObj.getTime(),
+        created_at: dateObj.toISOString()
       };
     });
-    const tmpPath = path.join('/tmp', 'juveriya_invitations.json');
-    fs.writeFileSync(tmpPath, JSON.stringify(formatted));
-    exec(`gh gist edit 22bf292d93eec0311a70d48436241829 -f invitations.json ${tmpPath}`, (err) => {
-      if (!err) console.log('✔ Gist synchronized with MySQL');
-    });
+
+    // 1. Update Cloud DB
+    try {
+      await fetch(CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Juveriya Wedding Invitations',
+          data: { invitations: formatted }
+        }),
+        signal: AbortSignal.timeout(4000)
+      });
+      console.log('✔ Cloud DB synchronized with MySQL');
+    } catch (e) {
+      console.warn('Cloud DB update error:', e.message);
+    }
+
+    // 2. Update Gist backup
+    try {
+      const tmpPath = path.join('/tmp', 'juveriya_invitations.json');
+      fs.writeFileSync(tmpPath, JSON.stringify(formatted));
+      exec(`gh gist edit ${GIST_ID} -f invitations.json ${tmpPath}`, (err) => {
+        if (!err) console.log('✔ Gist synchronized with MySQL');
+      });
+    } catch (e) {
+      console.warn('Gist sync error:', e.message);
+    }
   } catch (e) {
-    console.warn('Gist sync error:', e.message);
+    console.warn('Error pushing MySQL state to cloud:', e.message);
+  }
+}
+
+// Bidirectional Sync: Pull from Cloud DB and Push any missing MySQL records
+async function syncWithCloudDB() {
+  if (!pool || !isConnected) return;
+  try {
+    let cloudInvitations = [];
+    try {
+      const cRes = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(4000) });
+      if (cRes.ok) {
+        const cJson = await cRes.json();
+        if (cJson && cJson.data && Array.isArray(cJson.data.invitations)) {
+          cloudInvitations = cJson.data.invitations;
+        }
+      }
+    } catch (e) {
+      console.warn('Cloud DB pull warning:', e.message);
+    }
+
+    // Fetch MySQL records
+    const [mysqlRows] = await pool.query('SELECT * FROM invitations ORDER BY id DESC');
+    const mysqlMap = new Map();
+    mysqlRows.forEach(r => {
+      const key = (r.name || '').trim().toLowerCase();
+      if (key) mysqlMap.set(key, r);
+    });
+
+    // Check if any cloud items are missing in MySQL
+    let newlyInserted = false;
+    for (const cItem of cloudInvitations) {
+      const key = (cItem.name || '').trim().toLowerCase();
+      if (key && !mysqlMap.has(key)) {
+        try {
+          await pool.query(
+            `INSERT INTO invitations (name, with_family, greeting, invite_url, message, created_at)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              cItem.name.trim(),
+              Boolean(cItem.withFamily),
+              cItem.greeting || (cItem.withFamily ? `${cItem.name} with Family` : cItem.name),
+              cItem.inviteUrl || '',
+              cItem.message || '',
+              cItem.created_at ? new Date(cItem.created_at) : (cItem.timestamp ? new Date(cItem.timestamp) : new Date())
+            ]
+          );
+          newlyInserted = true;
+          console.log(`📥 Synced invitation from Cloud/Phone to MySQL: ${cItem.name}`);
+        } catch (insertErr) {
+          console.warn('Error inserting cloud item into MySQL:', insertErr.message);
+        }
+      }
+    }
+
+    // If new items were inserted or MySQL has items not yet in Cloud DB, update Cloud DB
+    if (newlyInserted || mysqlRows.length > cloudInvitations.length) {
+      await pushMySQLToCloudAndGist();
+    }
+  } catch (err) {
+    console.warn('Bidirectional sync warning:', err.message);
   }
 }
 
@@ -227,4 +316,8 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n\x1b[36m✨ Juveriya Wedding Portal running at http://localhost:${PORT}/\x1b[0m`);
   console.log(`\x1b[36m👑 Admin Studio: http://localhost:${PORT}/admin.html\x1b[0m\n`);
+
+  // Start initial sync and periodic background sync every 15 seconds
+  setTimeout(syncWithCloudDB, 2000);
+  setInterval(syncWithCloudDB, 15000);
 });

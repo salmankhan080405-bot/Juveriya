@@ -1478,43 +1478,46 @@
       // Hybrid Cloud & MySQL Database Client
       // Real-time synchronization across Laptop, Phone, and Local MySQL
       // ========================================================
-      const TUNNEL_API_BASE = 'https://e2615d944506cb.lhr.life';
-      const LOCAL_API_BASE = 'http://localhost:3000';
+      const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fe4aa2796642';
       const GIST_BACKUP_URL = 'https://gist.githubusercontent.com/salmankhan080405-bot/22bf292d93eec0311a70d48436241829/raw/invitations.json';
+      const IS_LOCAL_ENV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const LOCAL_API_BASE = IS_LOCAL_ENV ? (window.location.origin || 'http://localhost:3000') : '';
 
       class HybridDatabaseClient {
         constructor() {
-          this.connectedType = 'mysql';
+          this.connectedType = IS_LOCAL_ENV ? 'mysql' : 'cloud';
+        }
+
+        canUseLocalApi() {
+          return Boolean(IS_LOCAL_ENV && LOCAL_API_BASE);
         }
 
         async checkStatus() {
-          // 1. Check live tunnel to MySQL
-          try {
-            const res = await fetch(`${TUNNEL_API_BASE}/api/status`, { signal: AbortSignal.timeout(2000) });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.connected) {
-                this.updateStatusBadge('MySQL Connected');
-                return true;
+          // 1. If on laptop localhost, check MySQL server
+          if (this.canUseLocalApi()) {
+            try {
+              const res = await fetch(`${LOCAL_API_BASE}/api/status`, { signal: AbortSignal.timeout(1500) });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.connected) {
+                  this.updateStatusBadge('MySQL Connected');
+                  return true;
+                }
               }
+            } catch (e) {}
+          }
+
+          // 2. Check Cloud DB (always available on phone & mobile network)
+          try {
+            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(2500) });
+            if (res.ok) {
+              this.updateStatusBadge('Cloud DB Synced');
+              return true;
             }
           } catch (e) {}
 
-          // 2. Check local server if on laptop
-          try {
-            const res = await fetch(`${LOCAL_API_BASE}/api/status`, { signal: AbortSignal.timeout(1000) });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.connected) {
-                this.updateStatusBadge('MySQL (Local)');
-                return true;
-              }
-            }
-          } catch (e) {}
-
-          // 3. Cloud Gist backup
-          this.updateStatusBadge('Cloud DB Synced');
-          return true;
+          this.updateStatusBadge('Offline DB');
+          return false;
         }
 
         updateStatusBadge(text) {
@@ -1525,132 +1528,224 @@
             badge.style.borderColor = 'rgba(37, 211, 102, 0.5)';
             badge.style.color = '#85f2ad';
             badge.innerHTML = `<i class="fa-solid fa-database"></i> <span>${text}</span>`;
-          } else {
+          } else if (text.includes('Cloud')) {
             badge.style.background = 'rgba(33, 150, 243, 0.2)';
             badge.style.borderColor = 'rgba(33, 150, 243, 0.5)';
             badge.style.color = '#90caf9';
             badge.innerHTML = `<i class="fa-solid fa-cloud"></i> <span>${text}</span>`;
+          } else {
+            badge.style.background = 'rgba(234, 179, 8, 0.18)';
+            badge.style.borderColor = 'rgba(234, 179, 8, 0.5)';
+            badge.style.color = '#fde047';
+            badge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> <span>${text}</span>`;
           }
         }
 
+        mergeLists(localList, remoteList) {
+          const map = new Map();
+          for (const item of (remoteList || [])) {
+            const key = (item.name || '').trim().toLowerCase();
+            if (key) map.set(key, item);
+          }
+          for (const item of (localList || [])) {
+            const key = (item.name || '').trim().toLowerCase();
+            if (key) {
+              if (!map.has(key)) {
+                map.set(key, item);
+              } else {
+                const remoteItem = map.get(key);
+                const localTs = item.timestamp || (item.created_at ? new Date(item.created_at).getTime() : 0);
+                const remoteTs = remoteItem.timestamp || (remoteItem.created_at ? new Date(remoteItem.created_at).getTime() : 0);
+                if (localTs > remoteTs) {
+                  map.set(key, Object.assign({}, remoteItem, item));
+                }
+              }
+            }
+          }
+          return Array.from(map.values()).sort((a, b) => {
+            const tsA = a.timestamp || (a.created_at ? new Date(a.created_at).getTime() : Number(a.id) || 0);
+            const tsB = b.timestamp || (b.created_at ? new Date(b.created_at).getTime() : Number(b.id) || 0);
+            return tsB - tsA;
+          });
+        }
+
         async getAll() {
-          let list = [];
+          const localList = this.getLocalBackup();
 
-          // 1. Try Live MySQL via Tunnel (fast, direct to MySQL)
+          // 1. Try Local MySQL if running on laptop
+          if (this.canUseLocalApi()) {
+            try {
+              const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, { signal: AbortSignal.timeout(1800) });
+              if (res.ok) {
+                const json = await res.json();
+                if (Array.isArray(json.data)) {
+                  const formatted = this.formatRows(json.data);
+                  const merged = this.mergeLists(localList, formatted);
+                  this.saveLocalBackup(merged);
+                  this.updateStatusBadge('MySQL Connected');
+                  return merged;
+                }
+              }
+            } catch (e) {}
+          }
+
+          // 2. Try Cloud DB (works everywhere on mobile & GitHub Pages)
           try {
-            const res = await fetch(`${TUNNEL_API_BASE}/api/invitations`, { signal: AbortSignal.timeout(2500) });
+            const res = await fetch(CLOUD_DB_URL, { signal: AbortSignal.timeout(3000) });
             if (res.ok) {
               const json = await res.json();
-              if (Array.isArray(json.data)) {
-                this.saveLocalBackup(json.data);
-                this.updateStatusBadge('MySQL Connected');
-                return this.formatRows(json.data);
-              }
+              const cloudItems = (json && json.data && Array.isArray(json.data.invitations)) ? json.data.invitations : [];
+              const formatted = this.formatRows(cloudItems);
+              const merged = this.mergeLists(localList, formatted);
+              this.saveLocalBackup(merged);
+              this.updateStatusBadge('Cloud DB Synced');
+              return merged;
             }
           } catch (e) {}
 
-          // 2. Try Local MySQL directly
+          // 3. Try GitHub Gist CDN fallback
           try {
-            const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, { signal: AbortSignal.timeout(1000) });
-            if (res.ok) {
-              const json = await res.json();
-              if (Array.isArray(json.data)) {
-                this.saveLocalBackup(json.data);
-                this.updateStatusBadge('MySQL (Local)');
-                return this.formatRows(json.data);
-              }
-            }
-          } catch (e) {}
-
-          // 3. Try GitHub Gist CDN (always reachable on phone & cellular network)
-          try {
-            const res = await fetch(`${GIST_BACKUP_URL}?_t=${Date.now()}`, { signal: AbortSignal.timeout(2500) });
+            const res = await fetch(`${GIST_BACKUP_URL}?_t=${Date.now()}`, { signal: AbortSignal.timeout(2000) });
             if (res.ok) {
               const json = await res.json();
               if (Array.isArray(json)) {
-                this.saveLocalBackup(json);
+                const formatted = this.formatRows(json);
+                const merged = this.mergeLists(localList, formatted);
+                this.saveLocalBackup(merged);
                 this.updateStatusBadge('Cloud DB Synced');
-                return this.formatRows(json);
+                return merged;
               }
             }
           } catch (e) {}
 
-          // 4. Fallback to localStorage
-          list = this.getLocalBackup();
+          // 4. Return local backup if offline
           this.updateStatusBadge('Offline DB');
-          return this.formatRows(list);
+          return this.formatRows(localList);
         }
 
         async save(record) {
-          const item = Object.assign({
+          const now = new Date();
+          const item = {
             id: Date.now(),
-            created_at: new Date().toISOString()
-          }, record);
+            name: record.name.trim(),
+            withFamily: Boolean(record.withFamily),
+            greeting: record.greeting || (record.withFamily ? `${record.name} with Family` : record.name),
+            inviteUrl: record.inviteUrl || '',
+            message: record.message || '',
+            date: now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            created_at: now.toISOString(),
+            timestamp: now.getTime()
+          };
 
-          // Update local backup immediately
+          // 1. Instant local persistence (ensures immediate UI updates & prevents data loss)
           let currentList = this.getLocalBackup();
-          currentList = currentList.filter(x => (x.name || '').toLowerCase() !== (record.name || '').toLowerCase());
+          currentList = currentList.filter(x => (x.name || '').trim().toLowerCase() !== item.name.toLowerCase());
           currentList.unshift(item);
           this.saveLocalBackup(currentList);
 
-          // 1. Send to Live MySQL Tunnel
+          // 2. Concurrently update Cloud DB (laptop & phone share this immediately)
+          let cloudSuccess = false;
           try {
-            const res = await fetch(`${TUNNEL_API_BASE}/api/invitations`, {
-              method: 'POST',
+            const cloudRes = await fetch(CLOUD_DB_URL, {
+              method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(record),
-              signal: AbortSignal.timeout(3000)
+              body: JSON.stringify({
+                name: 'Juveriya Wedding Invitations',
+                data: { invitations: currentList }
+              }),
+              signal: AbortSignal.timeout(3500)
             });
-            if (res.ok) {
-              this.updateStatusBadge('MySQL Connected');
-              return { success: true, source: 'mysql', data: item };
+            if (cloudRes.ok) {
+              cloudSuccess = true;
+              this.updateStatusBadge('Cloud DB Synced');
             }
-          } catch (e) {}
+          } catch (e) {
+            console.warn('Cloud DB save warning:', e.message);
+          }
 
-          // 2. Send to Local MySQL
-          try {
-            const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(record),
-              signal: AbortSignal.timeout(1500)
-            });
-            if (res.ok) {
-              this.updateStatusBadge('MySQL (Local)');
-              return { success: true, source: 'mysql', data: item };
+          // 3. Concurrently save to local MySQL if running on laptop
+          let mysqlSuccess = false;
+          if (this.canUseLocalApi()) {
+            try {
+              const res = await fetch(`${LOCAL_API_BASE}/api/invitations`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(record),
+                signal: AbortSignal.timeout(2000)
+              });
+              if (res.ok) {
+                mysqlSuccess = true;
+                const resJson = await res.json();
+                if (resJson && resJson.id) item.id = resJson.id;
+                this.updateStatusBadge('MySQL Connected');
+              }
+            } catch (e) {
+              console.warn('Local MySQL save warning:', e.message);
             }
-          } catch (e) {}
+          }
 
-          return { success: true, source: 'local', data: item };
+          return {
+            success: true,
+            source: mysqlSuccess ? 'mysql' : (cloudSuccess ? 'cloud' : 'local'),
+            data: item
+          };
         }
 
         async delete(id) {
-          let list = this.getLocalBackup().filter(x => x.id !== Number(id) && x.id !== id);
+          let list = this.getLocalBackup().filter(x => String(x.id) !== String(id));
           this.saveLocalBackup(list);
 
-          // Delete from MySQL via tunnel
-          try {
-            await fetch(`${TUNNEL_API_BASE}/api/invitations/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(2000) });
-          } catch (e) {}
           // Delete from local MySQL
+          if (this.canUseLocalApi()) {
+            try {
+              await fetch(`${LOCAL_API_BASE}/api/invitations/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(2000) });
+            } catch (e) {}
+          }
+
+          // Delete from Cloud DB
           try {
-            await fetch(`${LOCAL_API_BASE}/api/invitations/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(1000) });
+            await fetch(CLOUD_DB_URL, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: 'Juveriya Wedding Invitations',
+                data: { invitations: list }
+              }),
+              signal: AbortSignal.timeout(3000)
+            });
           } catch (e) {}
         }
 
         async clear() {
           localStorage.removeItem(LOCAL_BACKUP_KEY);
+          localStorage.removeItem('juveriya_sent_relatives_list');
+
+          // Clear local MySQL
+          if (this.canUseLocalApi()) {
+            try {
+              await fetch(`${LOCAL_API_BASE}/api/invitations`, { method: 'DELETE', signal: AbortSignal.timeout(2000) });
+            } catch (e) {}
+          }
+
+          // Clear Cloud DB
           try {
-            await fetch(`${TUNNEL_API_BASE}/api/invitations`, { method: 'DELETE', signal: AbortSignal.timeout(2000) });
-          } catch (e) {}
-          try {
-            await fetch(`${LOCAL_API_BASE}/api/invitations`, { method: 'DELETE', signal: AbortSignal.timeout(1000) });
+            await fetch(CLOUD_DB_URL, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: 'Juveriya Wedding Invitations',
+                data: { invitations: [] }
+              }),
+              signal: AbortSignal.timeout(3000)
+            });
           } catch (e) {}
         }
 
         saveLocalBackup(list) {
           try {
             localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(list));
+            localStorage.setItem('juveriya_sent_relatives_list', JSON.stringify(list));
           } catch (e) {}
         }
 
@@ -1665,7 +1760,7 @@
 
         formatRows(rows) {
           return rows.map(r => {
-            const dateObj = r.created_at ? new Date(r.created_at) : new Date();
+            const dateObj = r.created_at ? new Date(r.created_at) : (r.timestamp ? new Date(r.timestamp) : new Date());
             const date = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return {
@@ -1827,32 +1922,44 @@
         const withFamily = withFamilyCheckbox.checked;
         const { message, inviteUrl, greeting } = getInviteData();
 
-        // 1. Launch WhatsApp IMMEDIATELY within user click (no delay, no double-send)
+        const record = {
+          name: relativeName,
+          withFamily: withFamily,
+          greeting: greeting,
+          inviteUrl: inviteUrl,
+          message: message
+        };
+
+        // 1. Immediately save to Database (instant local cache + cloud/MySQL sync)
+        let saveRes = null;
+        try {
+          saveRes = await db.save(record);
+        } catch (err) {
+          console.error('Error saving invitation:', err);
+        }
+
+        // 2. Instantly update all counters in UI
+        await updateCounters();
+
+        // 3. Show Database confirmation toast
+        const sourceText = (saveRes && saveRes.source === 'mysql') 
+          ? 'MySQL Database' 
+          : (saveRes && saveRes.source === 'cloud') 
+            ? 'Cloud Database' 
+            : 'Database';
+        showToast(`Saved ${greeting} in ${sourceText}!`);
+
+        // 4. Launch WhatsApp (opens contact picker)
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         window.open(waUrl, '_blank');
 
-        // 2. Store in MySQL Database in background
-        try {
-          const saveRes = await db.save({
-            name: relativeName,
-            withFamily: withFamily,
-            greeting: greeting,
-            inviteUrl: inviteUrl,
-            message: message
-          });
-          await updateCounters();
-          showToast(`Saved ${greeting} in Database!`);
-        } catch (err) {
-          console.error('Error saving invitation:', err);
-        } finally {
-          setTimeout(() => {
-            if (btnSubmit) {
-              btnSubmit.disabled = false;
-              btnSubmit.innerHTML = originalBtnHtml;
-            }
-            isSendingWhatsApp = false;
-          }, 2500);
-        }
+        setTimeout(() => {
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalBtnHtml;
+          }
+          isSendingWhatsApp = false;
+        }, 1500);
       });
 
       // Update count badges
@@ -1861,6 +1968,7 @@
         if (navTrackerCount) navTrackerCount.textContent = count;
         if (btnHistoryBadge) btnHistoryBadge.textContent = count;
         if (modalHistoryCount) modalHistoryCount.textContent = count;
+        if (historyTotalCount) historyTotalCount.textContent = count;
       }
 
       // ========================================================
@@ -1959,6 +2067,7 @@
             if (confirm(`Delete invitation record for "${name}" from MySQL database?`)) {
               await db.delete(id);
               await renderHistoryList(historySearchInput ? historySearchInput.value.trim() : '');
+              await updateCounters();
               showToast(`Deleted ${name} from database.`);
             }
           });
@@ -2041,6 +2150,7 @@
           if (confirm('Are you sure you want to clear all invitations from MySQL database? This cannot be undone.')) {
             await db.clear();
             await renderHistoryList('');
+            await updateCounters();
             showToast('All invitation history cleared from MySQL.');
           }
         });
