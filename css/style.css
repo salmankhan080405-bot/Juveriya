@@ -498,78 +498,9 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 50px 20px 50px;
+  padding: 30px 20px;
   position: relative;
   z-index: 10;
-}
-
-/* ==========================================================================
-   2B. SEQUENTIAL 3-STEP UNFOLDING STATUS BANNER
-   1 Second for each step (Horizontal, Diagonal, Vertical)
-   ========================================================================== */
-.unfold-step-banner {
-  position: relative;
-  margin-bottom: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: 
-    radial-gradient(circle at 50% 50%, rgba(13, 78, 59, 0.95) 0%, rgba(6, 40, 30, 0.98) 75%),
-    #06281e;
-  border: 1.5px solid var(--color-gold-primary);
-  border-radius: 30px;
-  padding: 8px 24px;
-  z-index: 80;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(223, 183, 108, 0.35);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-.unfold-step-banner.is-active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.unfold-step-banner.fade-out {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-}
-
-.step-badge {
-  font-family: var(--font-heading);
-  font-size: 0.82rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--color-gold-bright);
-  font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-}
-
-.step-dots {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.step-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(223, 183, 108, 0.25);
-  border: 1px solid var(--color-gold-primary);
-  transition: all 0.35s ease;
-}
-
-.step-dot.active {
-  background: var(--color-gold-bright);
-  box-shadow: 0 0 10px var(--color-gold-bright), 0 0 18px rgba(255, 215, 0, 0.8);
-  transform: scale(1.35);
 }
 
 .guest-invitation-ribbon {
